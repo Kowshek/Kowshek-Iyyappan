@@ -52,14 +52,14 @@
       "type": "custom-product-grid",
       "name": "Custom Product Grid",
       "settings": {
-        "title": "Our Collection",
+        "title": "Tisso vison in the wild",
         "product_list": [
           "black-leather-bag",
           "blue-silk-tuxedo",
           "chequered-red-shirt",
           "classic-leather-jacket",
-          "dark-denim-top",
-          "classic-varsity-top"
+          "classic-varsity-top",
+          "dark-denim-top"
         ]
       }
     }
