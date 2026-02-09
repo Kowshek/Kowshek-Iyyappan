@@ -1,3 +1,8 @@
+{% comment %}
+  CUSTOM PRODUCT GRID - FIGMA REPLICA & LINTER FIX
+  - Fixes "Missing width/height" error
+  - Matches Figma "Square/Sharp" aesthetic
+{% endcomment %}
 
 <div class="custom-product-grid section-{{ section.id }}">
   <div class="grid-container">
@@ -25,30 +30,32 @@
               {% endif %}
 
               <button class="hotspot-btn"
-                data-id="{{ product.id }}"
-                data-title="{{ product.title | escape }}"
-                data-price="{{ product.price | money }}"
-                data-desc="{{ product.description | escape }}"
-                onclick="openProductPopup(this)"
+                onclick="openProductPopup({{ product.id }})"
                 aria-label="View {{ product.title }}">
                 <span>+</span>
               </button>
             </div>
 
-            <div class="hidden-variants-data" id="variants-{{ product.id }}" style="display:none;">
-              [
-              {%- for variant in product.variants -%}
-                { 
-                  "id": {{ variant.id }}, 
-                  "title": "{{ variant.title | escape }}", 
-                  "option1": "{{- variant.option1 | escape -}}", 
-                  "option2": "{{ variant.option2 | escape }}", 
-                  "price": "{{ variant.price | money }}" 
-                }
-                {%- unless forloop.last %},{% endunless %}
-              {%- endfor -%}
-              ]
-            </div>
+            <script id="data-{{ product.id }}" type="application/json">
+              {
+                "id": {{ product.id }},
+                "title": "{{ product.title | escape }}",
+                "price": "{{ product.price | money }}",
+                "description": "{{ product.description | strip_html | truncatewords: 20 | escape }}",
+                "image": "{{ product.featured_image | image_url: width: 600 }}",
+                "variants": [
+                  {%- for variant in product.variants -%}
+                    {
+                      "id": {{ variant.id }},
+                      "title": "{{ variant.title | escape }}",
+                      "option1": "{{ variant.option1 | escape }}",
+                      "option2": "{{ variant.option2 | escape }}",
+                      "price": "{{ variant.price | money }}"
+                    }{%- unless forloop.last %},{% endunless %}
+                  {%- endfor -%}
+                ]
+              }
+            </script>
           </div>
         {%- endfor -%}
       {%- else -%}
@@ -59,256 +66,268 @@
 </div>
 
 <div id="product-popup" class="popup-overlay" style="display: none;">
-  <div class="popup-content">
-    <button class="close-btn" onclick="closePopup()">&times;</button>
-    <div class="popup-body">
-      <h2 id="popup-title">Product Title</h2>
-      <p id="popup-price">$0.00</p>
-      <div id="popup-description"></div>
+  <div class="popup-box">
+    <button class="close-btn" onclick="closePopup()" aria-label="Close">&times;</button>
+    
+    <div class="popup-grid">
+      <div class="popup-img-col">
+        <img id="popup-img" src="" alt="Product Preview" width="300" height="300">
+      </div>
 
-      <label for="variant-select">Choose Option:</label>
-      <select id="variant-select" class="variant-dropdown"></select>
+      <div class="popup-info-col">
+        <h2 id="popup-title">Product Title</h2>
+        <p id="popup-price">$0.00</p>
+        <div id="popup-desc" class="popup-desc"></div>
 
-      <button id="add-to-cart-btn" class="btn-add-cart">Add to Cart</button>
-      <p id="feedback-msg"></p>
+        <div class="selector-group">
+          <label class="selector-label">Color</label>
+          <div id="color-options-container" class="color-options">
+            </div>
+        </div>
+
+        <div class="selector-group">
+          <label class="selector-label">Size</label>
+          <div class="custom-select-wrapper">
+            <select id="size-select" class="custom-select">
+              <option value="" disabled selected>Choose your size</option>
+              </select>
+          </div>
+        </div>
+
+        <button id="add-to-cart-btn" class="btn-add-cart">
+          <span>ADD TO CART</span>
+          <span class="btn-arrow">&rarr;</span>
+        </button>
+        <p id="feedback-msg"></p>
+      </div>
     </div>
   </div>
 </div>
 
 <style>
-  /* CONTAINER */
-  .custom-product-grid {
-    padding: 60px 0;
-    background-color: #ffffff;
-  }
-
-  .grid-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 20px;
-  }
-
-  /* TITLE - Updated to match Image (Serif, Left Aligned) */
-  .grid-title {
-    text-align: left;
-    font-size: 32px;
-    font-family: "Times New Roman", Times, serif; /* Or your theme's serif font */
-    font-weight: 400;
-    margin-bottom: 30px;
-    color: #111;
-  }
-
-  /* GRID LAYOUT */
-  .product-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 20px; /* Tighter gap like the image */
-  }
-
-  /* PRODUCT CARD - Clean, no text */
-  .product-card {
-    position: relative;
-    border: none;
-    border-radius: 0; /* Removed rounding to match sharp look */
-    overflow: hidden;
-  }
-
-  .card-image {
-    position: relative;
-    width: 100%;
-    padding-top: 100%; /* Square Aspect Ratio */
-    background-color: #f4f4f4;
-  }
-
-  .card-image img {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.5s ease;
-  }
-
-  /* Hover Zoom Effect */
-  .product-card:hover .card-image img {
-    transform: scale(1.03);
-  }
-
-  /* THE HOTSPOT BUTTON STYLING */
+  /* --- GRID STYLES --- */
+  .custom-product-grid { padding: 60px 0; background: #fff; }
+  .grid-container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+  .grid-title { font-size: 32px; font-family: "Times New Roman", serif; margin-bottom: 30px; color: #111; }
+  .product-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .product-card { position: relative; }
+  .card-image { position: relative; width: 100%; padding-top: 100%; background: #f4f4f4; }
+  .card-image img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
+  
   .hotspot-btn {
-    position: absolute;
-    top: 60%; /* Arbitrary position to mimic "candid" look */
-    left: 65%;
-    width: 28px;
-    height: 28px;
-    background-color: #ffffff81;
-    border-radius: 50%;
-    border: none;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-    transition: transform 0.2s, background-color 0.2s;
-    z-index: 2;
+    position: absolute; top: 60%; left: 65%;
+    width: 28px; height: 28px; background: #fff; border-radius: 50%; border: none;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15); transition: transform 0.2s; z-index: 2;
   }
+  .hotspot-btn:hover { transform: scale(1.1); }
 
-  .hotspot-btn span {
-    color: #000;
-    font-size: 22px;
-    font-weight: 400;
-    line-height: 1;
-    margin-top: -2px; /* Visual center tweak */
-  }
-
-  .hotspot-btn:hover {
-    {% comment %} transform: scale(1.1); {% endcomment %}
-    background-color: #f0f0f0;
-  }
-
-  /* POPUP STYLES (Kept consistent) */
+  /* --- POPUP STYLES (MATCHING FIGMA) --- */
   .popup-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.6);
-    z-index: 9999;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.3s ease;
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.5); z-index: 9999;
+    display: flex; justify-content: center; align-items: center;
+    opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
   }
+  .popup-overlay[style*='display: flex'] { opacity: 1; pointer-events: auto; }
 
-  .popup-overlay[style*='display: flex'] {
-    opacity: 1;
-    pointer-events: auto;
-  }
-
-  .popup-content {
-    background: #fff;
-    padding: 40px;
-    width: 90%;
-    max-width: 500px;
-    border-radius: 4px;
-    position: relative;
-    text-align: left;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  .popup-box {
+    background: #fff; width: 90%; max-width: 600px;
+    position: relative; padding: 30px; 
+    /* Sharp corners per Figma */
+    border-radius: 0; 
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
   }
 
   .close-btn {
-    position: absolute;
-    top: 15px;
-    right: 20px;
-    font-size: 30px;
-    background: none;
-    border: none;
+    position: absolute; top: 10px; right: 15px; font-size: 24px;
+    background: none; border: none; cursor: pointer; color: #333; z-index: 10;
+  }
+
+  .popup-grid {
+    display: flex; gap: 25px;
+    align-items: flex-start;
+  }
+
+  .popup-img-col {
+    flex: 0 0 40%; /* Image takes 40% width */
+  }
+
+  .popup-img-col img {
+    width: 100%; height: auto; display: block; object-fit: cover;
+    aspect-ratio: 1 / 1; /* Ensures square even if image isn't */
+  }
+
+  .popup-info-col {
+    flex: 1;
+    text-align: left;
+    display: flex; flex-direction: column;
+  }
+
+  #popup-title {
+    font-size: 16px; font-weight: 400; margin: 0 0 5px; color: #333;
+    font-family: sans-serif;
+  }
+
+  #popup-price {
+    font-size: 15px; font-weight: 600; margin-bottom: 10px; color: #000;
+  }
+
+  .popup-desc {
+    font-size: 12px; line-height: 1.4; color: #666; margin-bottom: 20px;
+  }
+
+  /* --- SELECTORS (FIGMA STYLE) --- */
+  .selector-group { margin-bottom: 15px; }
+  .selector-label { display: block; font-size: 12px; margin-bottom: 5px; color: #333; }
+
+  /* Color Buttons: Rectangular, Sharp */
+  .color-options { display: flex; gap: 0; }
+  .color-btn {
+    flex: 1;
+    background: #fff; border: 1px solid #ccc; 
+    padding: 10px 0; font-size: 13px; cursor: pointer; 
+    text-align: center; transition: all 0.2s;
+    border-radius: 0; /* Sharp corners */
+    color: #333;
+    margin-right: -1px; /* Merges borders */
+  }
+  
+  /* Active State: Black Background */
+  .color-btn.active { 
+    background: #000; color: #fff; border-color: #000; z-index: 1; 
+  }
+
+  /* Size Dropdown */
+  .custom-select-wrapper { position: relative; width: 100%; }
+  .custom-select {
+    width: 100%; padding: 10px 12px; font-size: 13px;
+    border: 1px solid #ccc; background: #fff; color: #333;
+    appearance: none; -webkit-appearance: none; 
+    border-radius: 0; /* Sharp corners */
     cursor: pointer;
-    color: #999;
+  }
+  
+  /* Custom Chevron Arrow */
+  .custom-select-wrapper::after {
+    content: "";
+    position: absolute; right: 15px; top: 14px;
+    width: 8px; height: 8px;
+    border-right: 1px solid #333; border-bottom: 1px solid #333;
+    transform: rotate(45deg); pointer-events: none;
   }
 
-  .variant-dropdown {
-    width: 100%;
-    padding: 12px;
-    border: 1px solid #ddd;
-    margin: 20px 0;
-    font-size: 16px;
-  }
-
+  /* Add to Cart: Black Bar */
   .btn-add-cart {
-    width: 100%;
-    background-color: #000;
-    color: #fff;
-    padding: 15px;
-    border: none;
-    font-size: 16px;
-    text-transform: uppercase;
-    cursor: pointer;
-    font-weight: 600;
+    width: 100%; background-color: #000; color: #fff;
+    padding: 14px 20px; border: none; font-size: 13px;
+    text-transform: uppercase; letter-spacing: 1px;
+    cursor: pointer; margin-top: 15px;
+    display: flex; justify-content: space-between; align-items: center;
+    border-radius: 0; /* Sharp corners */
   }
+  .btn-add-cart:hover { opacity: 0.9; }
+  .btn-arrow { font-size: 18px; line-height: 1; }
 
-  /* RESPONSIVE */
-  @media (max-width: 768px) {
-    .product-grid {
-      grid-template-columns: repeat(2, 1fr);
-      gap: 10px;
-    }
-    .grid-title {
-      font-size: 24px;
-      text-align: center; /* Often looks better centered on mobile */
-    }
+  /* Mobile Responsive */
+  @media (max-width: 600px) {
+    .popup-grid { flex-direction: column; }
+    .popup-img-col { width: 100px; margin: 0 auto; }
   }
 </style>
 
 <script>
-  let selectedVariantId = null;
+  let currentProductData = null;
+  let selectedColor = null;
+  let selectedSize = null;
 
-  function openProductPopup(btn) {
-    const title = btn.getAttribute('data-title');
-    const price = btn.getAttribute('data-price');
-    const desc = btn.getAttribute('data-desc');
-    const productId = btn.getAttribute('data-id');
+  function openProductPopup(productId) {
+    const jsonScript = document.getElementById('data-' + productId);
+    currentProductData = JSON.parse(jsonScript.textContent);
 
-    document.getElementById('popup-title').innerText = title;
-    document.getElementById('popup-price').innerText = price;
-    document.getElementById('popup-description').innerHTML = desc;
+    document.getElementById('popup-img').src = currentProductData.image;
+    document.getElementById('popup-title').innerText = currentProductData.title;
+    document.getElementById('popup-price').innerText = currentProductData.price;
+    document.getElementById('popup-desc').innerHTML = currentProductData.description;
 
-    // Get Variants Data
-    const variantsDiv = document.getElementById('variants-' + productId);
-    const variants = JSON.parse(variantsDiv.textContent);
+    setupSelectors();
+    document.getElementById('product-popup').style.display = 'flex';
+  }
 
-    // Build Dropdown
-    const select = document.getElementById('variant-select');
-    select.innerHTML = '';
+  function setupSelectors() {
+    const colorContainer = document.getElementById('color-options-container');
+    const sizeSelect = document.getElementById('size-select');
+    
+    colorContainer.innerHTML = '';
+    sizeSelect.innerHTML = '<option value="" disabled selected>Choose your size</option>';
+    selectedColor = null;
+    selectedSize = null;
 
-    variants.forEach((v, index) => {
-      const option = document.createElement('option');
-      option.value = v.id;
-      option.text = `${v.title} - ${v.price}`;
+    const colors = [...new Set(currentProductData.variants.map(v => v.option1))];
+    const sizes = [...new Set(currentProductData.variants.map(v => v.option2))];
+
+    // Build Rectangular Color Buttons
+    colors.forEach((color, index) => {
+      const btn = document.createElement('button');
+      btn.className = 'color-btn';
+      btn.innerText = color;
       
-      // Store options for Trap Logic
-      option.setAttribute('data-opt1', (v.option1 || '').toLowerCase());
-      option.setAttribute('data-opt2', (v.option2 || '').toLowerCase());
+      // Auto-select first color
+      if(index === 0) {
+        btn.classList.add('active');
+        selectedColor = color;
+      }
 
-      select.appendChild(option);
-      if (index === 0) selectedVariantId = v.id;
+      btn.onclick = function() {
+        document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        selectedColor = color;
+      };
+      
+      colorContainer.appendChild(btn);
     });
 
-    select.onchange = function () {
-      selectedVariantId = this.value;
-    };
+    sizes.forEach(size => {
+      const option = document.createElement('option');
+      option.value = size;
+      option.innerText = size;
+      sizeSelect.appendChild(option);
+    });
 
-    document.getElementById('product-popup').style.display = 'flex';
+    sizeSelect.onchange = function() {
+      selectedSize = this.value;
+    };
   }
 
   function closePopup() {
     document.getElementById('product-popup').style.display = 'none';
   }
 
-  // --- TRAP LOGIC (Unchanged) ---
   document.getElementById('add-to-cart-btn').addEventListener('click', function (e) {
     e.preventDefault();
-    if (!selectedVariantId) return;
 
-    const select = document.getElementById('variant-select');
-    const selectedOption = select.options[select.selectedIndex];
-    const opt1 = selectedOption.getAttribute('data-opt1');
-    const opt2 = selectedOption.getAttribute('data-opt2');
-
-    const isTrap =
-      (opt1 === 'black' && (opt2 === 'medium' || opt2 === 'm')) ||
-      (opt2 === 'black' && (opt1 === 'medium' || opt1 === 'm'));
-
-    const items = [{ id: selectedVariantId, quantity: 1 }];
-
-    if (isTrap) {
-      console.log('Trap Triggered: Black Medium selected.');
-      // Add logic here if you want to add the free gift ID
+    if (!selectedColor || !selectedSize) {
+      alert("Please select both a Color and a Size.");
+      return;
     }
+
+    const variant = currentProductData.variants.find(v => 
+      v.option1 === selectedColor && v.option2 === selectedSize
+    );
+
+    if (!variant) {
+      alert("Sorry, this combination is out of stock.");
+      return;
+    }
+
+    // Trap Logic
+    const isTrap = 
+      (selectedColor.toLowerCase() === 'black' && (selectedSize.toLowerCase() === 'medium' || selectedSize.toLowerCase() === 'm'));
+
+    const items = [{ id: variant.id, quantity: 1 }];
+    
+    // Add Trap Item Logic here if needed
+    // if (isTrap) items.push({ id: 123456789, quantity: 1 });
 
     fetch(window.Shopify.routes.root + 'cart/add.js', {
       method: 'POST',
@@ -317,14 +336,16 @@
     })
       .then((response) => response.json())
       .then((data) => {
-        document.getElementById('feedback-msg').innerText = 'Added to Cart!';
-        document.getElementById('feedback-msg').style.color = 'green';
-        setTimeout(closePopup, 1500);
+        const btn = document.getElementById('add-to-cart-btn');
+        btn.querySelector('span').innerText = 'ADDED!';
+        setTimeout(() => { 
+          btn.querySelector('span').innerText = 'ADD TO CART'; 
+          closePopup(); 
+        }, 1000);
       })
       .catch((error) => {
         console.error('Error:', error);
-        document.getElementById('feedback-msg').innerText = 'Error adding to cart.';
-        document.getElementById('feedback-msg').style.color = 'red';
+        alert('Error adding to cart.');
       });
   });
 </script>
