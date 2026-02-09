@@ -1,7 +1,7 @@
 {% comment %}
-  CUSTOM PRODUCT GRID SECTION
-  - Displays 6 products
-  - Opens a Popup
+  CUSTOM PRODUCT GRID SECTION - LOOKBOOK STYLE
+  - Displays 6 products as pure images
+  - "Hotspot" (+) icon triggers popup
   - Handles "Black + Medium" Trap Logic
 {% endcomment %}
 
@@ -20,39 +20,41 @@
             <div class="card-image">
               {% if product.featured_image %}
                 <img
-                  src="{{ product.featured_image | image_url: width: 600 }}"
+                  src="{{ product.featured_image | image_url: width: 800 }}"
                   alt="{{ product.title }}"
                   loading="lazy"
-                  width="600"
-                  height="600"
+                  width="800"
+                  height="800"
                 >
               {% else %}
                 {{ 'product-1' | placeholder_svg_tag }}
               {% endif %}
-            </div>
-            {% comment %} <div class="card-info">
-              <h3>{{ product.title }}</h3>
-              <p>{{ product.price | money }}</p>
-                <button class="btn-view-details"
-                  data-id="{{ product.id }}"
-                  data-title="{{ product.title | escape }}"
-                  data-price="{{ product.price | money }}"
-                  data-desc="{{ product.description | escape }}"
-                  onclick="openProductPopup(this)">
-                  View Details
-                </button>
 
-              <div class="hidden-variants-data" id="variants-{{ product.id }}" style="display:none;">
-                [
-                {%- for variant in product.variants -%}
-                  { "id": {{ variant.id }}, "title": "{{ variant.title | escape }}", "option1": "
-                  {{- variant.option1 | escape -}}
-                  ", "option2": "{{ variant.option2 | escape }}", "price": "{{ variant.price | money }}" }
-                  {%- unless forloop.last %},{% endunless %}
-                {%- endfor -%}
-                ]
-              </div>
-            </div> {% endcomment %}
+              <button class="hotspot-btn"
+                data-id="{{ product.id }}"
+                data-title="{{ product.title | escape }}"
+                data-price="{{ product.price | money }}"
+                data-desc="{{ product.description | escape }}"
+                onclick="openProductPopup(this)"
+                aria-label="View {{ product.title }}">
+                <span>+</span>
+              </button>
+            </div>
+
+            <div class="hidden-variants-data" id="variants-{{ product.id }}" style="display:none;">
+              [
+              {%- for variant in product.variants -%}
+                { 
+                  "id": {{ variant.id }}, 
+                  "title": "{{ variant.title | escape }}", 
+                  "option1": "{{- variant.option1 | escape -}}", 
+                  "option2": "{{ variant.option2 | escape }}", 
+                  "price": "{{ variant.price | money }}" 
+                }
+                {%- unless forloop.last %},{% endunless %}
+              {%- endfor -%}
+              ]
+            </div>
           </div>
         {%- endfor -%}
       {%- else -%}
@@ -80,7 +82,7 @@
 </div>
 
 <style>
-  /* CONTAINER & TITLE */
+  /* CONTAINER */
   .custom-product-grid {
     padding: 60px 0;
     background-color: #ffffff;
@@ -92,44 +94,36 @@
     padding: 0 20px;
   }
 
+  /* TITLE - Updated to match Image (Serif, Left Aligned) */
   .grid-title {
-    text-align: center;
-    font-size: 36px;
-    font-weight: 700;
-    margin-bottom: 40px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
+    text-align: left;
+    font-size: 32px;
+    font-family: "Times New Roman", Times, serif; /* Or your theme's serif font */
+    font-weight: 400;
+    margin-bottom: 30px;
+    color: #111;
   }
 
-  /* THE GRID LAYOUT */
+  /* GRID LAYOUT */
   .product-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr); /* Standard 3-column layout */
-    gap: 30px;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px; /* Tighter gap like the image */
   }
 
-  /* PRODUCT CARD STYLING */
+  /* PRODUCT CARD - Clean, no text */
   .product-card {
-    background: #fff;
-    border: 1px solid #e1e1e1;
-    border-radius: 8px;
+    position: relative;
+    border: none;
+    border-radius: 0; /* Removed rounding to match sharp look */
     overflow: hidden;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    display: flex;
-    flex-direction: column;
-  }
-
-  .product-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
   }
 
   .card-image {
     position: relative;
     width: 100%;
-    padding-top: 100%; /* Forces a square aspect ratio */
-    overflow: hidden;
-    background-color: #f9f9f9;
+    padding-top: 100%; /* Square Aspect Ratio */
+    background-color: #f4f4f4;
   }
 
   .card-image img {
@@ -138,58 +132,48 @@
     left: 0;
     width: 100%;
     height: 100%;
-    object-fit: cover; /* Ensures image fills the square without distortion */
+    object-fit: cover;
     transition: transform 0.5s ease;
   }
 
+  /* Hover Zoom Effect */
   .product-card:hover .card-image img {
-    transform: scale(1.05); /* Subtle zoom effect on hover */
+    transform: scale(1.03);
   }
 
-  .card-info {
-    padding: 20px;
-    text-align: center;
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-  }
-
-  .card-info h3 {
-    font-size: 18px;
-    font-weight: 600;
-    margin: 0 0 10px;
-    color: #333;
-  }
-
-  .card-info p {
-    font-size: 16px;
-    color: #666;
-    font-weight: 500;
-    margin-bottom: 15px;
-  }
-
-  /* BUTTONS */
-  .btn-view-details {
-    background-color: #000;
-    color: #fff;
+  /* THE HOTSPOT BUTTON STYLING */
+  .hotspot-btn {
+    position: absolute;
+    top: 60%; /* Arbitrary position to mimic "candid" look */
+    left: 65%;
+    width: 28px;
+    height: 28px;
+    background-color: #ffffff;
+    border-radius: 50%;
     border: none;
-    padding: 12px 24px;
-    font-size: 14px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 1px;
     cursor: pointer;
-    border-radius: 4px; /* Slight rounding - safe bet */
-    width: 100%;
-    transition: background-color 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    transition: transform 0.2s, background-color 0.2s;
+    z-index: 2;
   }
 
-  .btn-view-details:hover {
-    background-color: #333;
+  .hotspot-btn span {
+    color: #000;
+    font-size: 18px;
+    font-weight: 400;
+    line-height: 1;
+    margin-top: -2px; /* Visual center tweak */
   }
 
-  /* POPUP STYLES */
+  .hotspot-btn:hover {
+    transform: scale(1.1);
+    background-color: #f0f0f0;
+  }
+
+  /* POPUP STYLES (Kept consistent) */
   .popup-overlay {
     position: fixed;
     top: 0;
@@ -206,7 +190,6 @@
     transition: opacity 0.3s ease;
   }
 
-  /* When active, show popup */
   .popup-overlay[style*='display: flex'] {
     opacity: 1;
     pointer-events: auto;
@@ -217,7 +200,7 @@
     padding: 40px;
     width: 90%;
     max-width: 500px;
-    border-radius: 8px;
+    border-radius: 4px;
     position: relative;
     text-align: left;
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
@@ -232,18 +215,12 @@
     border: none;
     cursor: pointer;
     color: #999;
-    transition: color 0.3s;
-  }
-
-  .close-btn:hover {
-    color: #000;
   }
 
   .variant-dropdown {
     width: 100%;
     padding: 12px;
     border: 1px solid #ddd;
-    border-radius: 4px;
     margin: 20px 0;
     font-size: 16px;
   }
@@ -255,29 +232,20 @@
     padding: 15px;
     border: none;
     font-size: 16px;
-    font-weight: bold;
     text-transform: uppercase;
     cursor: pointer;
-    transition: opacity 0.3s;
+    font-weight: 600;
   }
 
-  .btn-add-cart:hover {
-    opacity: 0.9;
-  }
-
-  /* RESPONSIVE DESIGN */
-  @media (max-width: 990px) {
+  /* RESPONSIVE */
+  @media (max-width: 768px) {
     .product-grid {
       grid-template-columns: repeat(2, 1fr);
-    }
-  }
-
-  @media (max-width: 576px) {
-    .product-grid {
-      grid-template-columns: 1fr;
+      gap: 10px;
     }
     .grid-title {
-      font-size: 28px;
+      font-size: 24px;
+      text-align: center; /* Often looks better centered on mobile */
     }
   }
 </style>
@@ -286,23 +254,20 @@
   let selectedVariantId = null;
 
   function openProductPopup(btn) {
-    // 1. Get Data from Button Attributes
     const title = btn.getAttribute('data-title');
     const price = btn.getAttribute('data-price');
-    const desc = btn.getAttribute('data-desc'); // Note: HTML might be escaped
+    const desc = btn.getAttribute('data-desc');
     const productId = btn.getAttribute('data-id');
 
-    // 2. Populate Popup UI
     document.getElementById('popup-title').innerText = title;
     document.getElementById('popup-price').innerText = price;
-    // Basic unescape for description if needed, or just text
     document.getElementById('popup-description').innerHTML = desc;
 
-    // 3. Get Variants Data
+    // Get Variants Data
     const variantsDiv = document.getElementById('variants-' + productId);
     const variants = JSON.parse(variantsDiv.textContent);
 
-    // 4. Build Dropdown
+    // Build Dropdown
     const select = document.getElementById('variant-select');
     select.innerHTML = '';
 
@@ -310,8 +275,8 @@
       const option = document.createElement('option');
       option.value = v.id;
       option.text = `${v.title} - ${v.price}`;
-
-      // Store options for the "Trap" logic
+      
+      // Store options for Trap Logic
       option.setAttribute('data-opt1', (v.option1 || '').toLowerCase());
       option.setAttribute('data-opt2', (v.option2 || '').toLowerCase());
 
@@ -319,12 +284,10 @@
       if (index === 0) selectedVariantId = v.id;
     });
 
-    // Update selected ID on change
     select.onchange = function () {
       selectedVariantId = this.value;
     };
 
-    // Show Popup
     document.getElementById('product-popup').style.display = 'flex';
   }
 
@@ -332,18 +295,16 @@
     document.getElementById('product-popup').style.display = 'none';
   }
 
-  // --- TRAP LOGIC ---
+  // --- TRAP LOGIC (Unchanged) ---
   document.getElementById('add-to-cart-btn').addEventListener('click', function (e) {
     e.preventDefault();
     if (!selectedVariantId) return;
 
     const select = document.getElementById('variant-select');
     const selectedOption = select.options[select.selectedIndex];
-
     const opt1 = selectedOption.getAttribute('data-opt1');
     const opt2 = selectedOption.getAttribute('data-opt2');
 
-    // CHECK: Is it Black AND Medium? (Order doesn't matter)
     const isTrap =
       (opt1 === 'black' && (opt2 === 'medium' || opt2 === 'm')) ||
       (opt2 === 'black' && (opt1 === 'medium' || opt1 === 'm'));
@@ -351,15 +312,10 @@
     const items = [{ id: selectedVariantId, quantity: 1 }];
 
     if (isTrap) {
-      console.log('Trap Triggered: Attempting to add gift...');
-      // Hardcode the ID for "Soft Winter Jacket" if you know it.
-      // If not, we try to fetch it or just alert for now.
-      // REPLACE THIS ID WITH THE REAL ONE FROM YOUR CSV IMPORT IF YOU HAVE IT
-      // For now, let's just log it.
-      // items.push({ id: 123456789, quantity: 1 });
+      console.log('Trap Triggered: Black Medium selected.');
+      // Add logic here if you want to add the free gift ID
     }
 
-    // Add to Cart Fetch
     fetch(window.Shopify.routes.root + 'cart/add.js', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -373,7 +329,7 @@
       })
       .catch((error) => {
         console.error('Error:', error);
-        document.getElementById('feedback-msg').innerText = 'Error.';
+        document.getElementById('feedback-msg').innerText = 'Error adding to cart.';
         document.getElementById('feedback-msg').style.color = 'red';
       });
   });
@@ -381,13 +337,13 @@
 
 {% schema %}
 {
-  "name": "Custom Product Grid",
+  "name": "Lookbook Grid",
   "settings": [
     {
       "type": "text",
       "id": "title",
       "label": "Grid Title",
-      "default": "Our Collection"
+      "default": "Tisso vison in the wild"
     },
     {
       "type": "product_list",
@@ -398,7 +354,7 @@
   ],
   "presets": [
     {
-      "name": "Custom Product Grid"
+      "name": "Lookbook Grid"
     }
   ]
 }
