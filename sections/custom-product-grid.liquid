@@ -29,9 +29,11 @@
                 {{ 'product-1' | placeholder_svg_tag }}
               {% endif %}
 
-              <button class="hotspot-btn"
+              <button
+                class="hotspot-btn"
                 onclick="openProductPopup({{ product.id }})"
-                aria-label="View {{ product.title }}">
+                aria-label="View {{ product.title }}"
+              >
                 <span>+</span>
               </button>
             </div>
@@ -68,21 +70,23 @@
 <div id="product-popup" class="popup-overlay" style="display: none;">
   <div class="popup-box">
     <button class="close-btn" onclick="closePopup()" aria-label="Close">&times;</button>
-    
+
     <div class="popup-grid">
       <div class="popup-img-col">
         <img id="popup-img" src="" alt="Product Preview" width="300" height="300">
       </div>
 
       <div class="popup-info-col">
-        <h2 id="popup-title">Product Title</h2>
-        <p id="popup-price">$0.00</p>
+        <div class="popup-header">
+          <h2 id="popup-title">Product Title</h2>
+          <p id="popup-price">$0.00</p>
+        </div>
+
         <div id="popup-desc" class="popup-desc"></div>
 
         <div class="selector-group">
           <label class="selector-label">Color</label>
-          <div id="color-options-container" class="color-options">
-            </div>
+          <div id="color-options-container" class="color-options"></div>
         </div>
 
         <div class="selector-group">
@@ -90,13 +94,22 @@
           <div class="custom-select-wrapper">
             <select id="size-select" class="custom-select">
               <option value="" disabled selected>Choose your size</option>
-              </select>
+            </select>
+            <div class="select-arrow-box">
+              <svg width="12" height="8" viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M1 1.5L6 6.5L11 1.5" stroke="black" stroke-width="1.5"/>
+              </svg>
+            </div>
           </div>
         </div>
 
         <button id="add-to-cart-btn" class="btn-add-cart">
           <span>ADD TO CART</span>
-          <span class="btn-arrow">&rarr;</span>
+          <span class="btn-arrow-long">
+            <svg width="24" height="8" viewBox="0 0 24 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M0 4H23M23 4L20 1M23 4L20 7" stroke="white" stroke-width="1.5"/>
+            </svg>
+          </span>
         </button>
         <p id="feedback-msg"></p>
       </div>
@@ -106,133 +119,386 @@
 
 <style>
   /* --- GRID STYLES --- */
-  .custom-product-grid { padding: 60px 0; background: #fff; }
-  .grid-container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
-  .grid-title { font-size: 32px; font-family: "Times New Roman", serif; margin-bottom: 30px; color: #111; }
-  .product-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-  .product-card { position: relative; }
-  .card-image { position: relative; width: 100%; padding-top: 100%; background: #f4f4f4; }
-  .card-image img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
-  
-  .hotspot-btn {
-    position: absolute; top: 60%; left: 65%;
-    width: 28px; height: 28px; background: #fff; border-radius: 50%; border: none;
-    cursor: pointer; display: flex; align-items: center; justify-content: center;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.15); transition: transform 0.2s; z-index: 2;
+  .custom-product-grid {
+    padding: 60px 0;
+    background: #fff;
   }
-  .hotspot-btn:hover { transform: scale(1.1); }
+  .grid-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+  .grid-title {
+    font-size: 32px;
+    font-family: 'Times New Roman', serif;
+    margin-bottom: 30px;
+    color: #111;
+  }
+  .product-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+  .product-card {
+    position: relative;
+  }
+  .card-image {
+    position: relative;
+    width: 100%;
+    padding-top: 100%;
+    background: #f4f4f4;
+  }
+  .card-image img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
 
-  /* --- POPUP STYLES (MATCHING FIGMA) --- */
-  .popup-overlay {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0, 0, 0, 0.5); z-index: 9999;
-    display: flex; justify-content: center; align-items: center;
-    opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+  .hotspot-btn {
+    position: absolute;
+    top: 60%;
+    left: 65%;
+    width: 28px;
+    height: 28px;
+    background: #fff;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    transition: transform 0.2s;
+    z-index: 2;
   }
-  .popup-overlay[style*='display: flex'] { opacity: 1; pointer-events: auto; }
+  .hotspot-btn:hover {
+    transform: scale(1.1);
+  }
+
+  .popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+  .popup-overlay[style*='display: flex'] {
+    opacity: 1;
+    pointer-events: auto;
+  }
 
   .popup-box {
-    background: #fff; width: 90%; max-width: 600px;
-    position: relative; padding: 30px; 
-    /* Sharp corners per Figma */
-    border-radius: 0; 
-    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    background: #fff;
+    width: 550px; /* Fixed width for consistency */
+    position: relative;
+    padding: 40px;
+    border-radius: 0; /* Sharp corners */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
   }
 
   .close-btn {
-    position: absolute; top: 10px; right: 15px; font-size: 24px;
-    background: none; border: none; cursor: pointer; color: #333; z-index: 10;
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 28px;
+    font-weight: 300;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #000;
+    z-index: 10;
+    line-height: 1;
   }
 
   .popup-grid {
-    display: flex; gap: 25px;
+    display: flex;
+    gap: 20px;
     align-items: flex-start;
   }
 
   .popup-img-col {
-    flex: 0 0 40%; /* Image takes 40% width */
+    flex: 0 0 160px; /* Exact width constraint for image */
   }
 
   .popup-img-col img {
-    width: 100%; height: auto; display: block; object-fit: cover;
-    aspect-ratio: 1 / 1; /* Ensures square even if image isn't */
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: cover;
+    aspect-ratio: 1 / 1.1; /* Slightly taller than square */
   }
 
   .popup-info-col {
     flex: 1;
     text-align: left;
-    display: flex; flex-direction: column;
+    display: flex;
+    flex-direction: column;
   }
 
   #popup-title {
-    font-size: 16px; font-weight: 400; margin: 0 0 5px; color: #333;
+    font-size: 18px;
+    font-weight: 400;
+    margin: 0 0 8px;
+    color: #111;
     font-family: sans-serif;
+    letter-spacing: 0.5px;
   }
 
   #popup-price {
-    font-size: 15px; font-weight: 600; margin-bottom: 10px; color: #000;
+    font-size: 16px;
+    font-weight: 400;
+    margin-bottom: 15px;
+    color: #111;
   }
 
   .popup-desc {
-    font-size: 12px; line-height: 1.4; color: #666; margin-bottom: 20px;
+    font-size: 13px;
+    line-height: 1.5;
+    color: #444;
+    margin-bottom: 25px;
+    font-family: sans-serif;
   }
 
-  /* --- SELECTORS (FIGMA STYLE) --- */
-  .selector-group { margin-bottom: 15px; }
-  .selector-label { display: block; font-size: 12px; margin-bottom: 5px; color: #333; }
+  /* --- SELECTORS (FIGMA EXACT) --- */
+  .selector-group {
+    margin-bottom: 20px;
+  }
+  .selector-label {
+    display: block;
+    font-size: 13px;
+    margin-bottom: 8px;
+    color: #333;
+  }
 
-  /* Color Buttons: Rectangular, Sharp */
-  .color-options { display: flex; gap: 0; }
+  /* Color Buttons: Bordered Container */
+  .color-options {
+    display: flex;
+    border: 1px solid #ddd; /* Light grey border for container */
+    width: 100%;
+  }
   .color-btn {
     flex: 1;
-    background: #fff; border: 1px solid #ccc; 
-    padding: 10px 0; font-size: 13px; cursor: pointer; 
-    text-align: center; transition: all 0.2s;
+    background: #fff;
+    border: none;
+    padding: 12px 0;
+    font-size: 14px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s;
+    color: #000;
+    border-right: 1px solid #ddd; /* Divider line */
+  }
+  .color-btn:last-child {
+    border-right: none;
+  }
+
+  /* Active State: Solid Black */
+  .color-btn.active {
+    background: #000;
+    color: #fff;
+    /* Fix: Active button covers the border */
+    margin: -1px;
+    border: 1px solid #000;
+    position: relative;
+    z-index: 2;
+  }
+
+  /* Size Dropdown: Split Box Style */
+  .custom-select-wrapper {
+    position: relative;
+    width: 100%;
+    border: 1px solid #ddd; /* Main border */
+    display: flex;
+    height: 45px;
+  }
+
+  .custom-select {
+    width: 100%;
+    height: 100%;
+    padding: 0 15px;
+    font-size: 14px;
+    border: none;
+    background: transparent;
+    color: #000;
+    appearance: none;
+    -webkit-appearance: none;
+    cursor: pointer;
+    z-index: 2; /* Sits above arrow */
+  }
+  .custom-select:focus {
+    outline: none;
+  }
+
+  /* The Arrow Box on the Right */
+  .select-arrow-box {
+    width: 45px; /* Square box */
+    height: 100%;
+    border-left: 1px solid #ddd;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    pointer-events: none; /* Let clicks pass through */
+    position: absolute;
+    right: 0;
+    top: 0;
+  }
+
+  /* Add to Cart: Solid Black */
+  .btn-add-cart {
+    width: 100%;
+    background-color: #000;
+    color: #fff;
+    padding: 16px 25px;
+    border: none;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    margin-top: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 0;
+  }
+  .btn-add-cart:hover {
+    opacity: 0.9;
+  }
+
+  /* Helper to align svg icon */
+  .btn-arrow-long {
+    display: flex;
+    align-items: center;
+  }
+
+  /* Mobile Responsive */
+  @media (max-width: 600px) {
+    .popup-box {
+      width: 95%;
+      padding: 20px;
+    }
+    .popup-grid {
+      flex-direction: column;
+    }
+    .popup-img-col {
+      width: 100px;
+      margin-bottom: 15px;
+    }
+  }
+  /* --- SELECTORS (FIGMA STYLE) --- */
+  .selector-group {
+    margin-bottom: 15px;
+  }
+  .selector-label {
+    display: block;
+    font-size: 12px;
+    margin-bottom: 5px;
+    color: #333;
+  }
+
+  /* Color Buttons: Rectangular, Sharp */
+  .color-options {
+    display: flex;
+    gap: 0;
+  }
+  .color-btn {
+    flex: 1;
+    background: #fff;
+    border: 1px solid #ccc;
+    padding: 10px 0;
+    font-size: 13px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s;
     border-radius: 0; /* Sharp corners */
     color: #333;
     margin-right: -1px; /* Merges borders */
   }
-  
+
   /* Active State: Black Background */
-  .color-btn.active { 
-    background: #000; color: #fff; border-color: #000; z-index: 1; 
+  .color-btn.active {
+    background: #000;
+    color: #fff;
+    border-color: #000;
+    z-index: 1;
   }
 
   /* Size Dropdown */
-  .custom-select-wrapper { position: relative; width: 100%; }
+  .custom-select-wrapper {
+    position: relative;
+    width: 100%;
+  }
   .custom-select {
-    width: 100%; padding: 10px 12px; font-size: 13px;
-    border: 1px solid #ccc; background: #fff; color: #333;
-    appearance: none; -webkit-appearance: none; 
+    width: 100%;
+    padding: 10px 12px;
+    font-size: 13px;
+    border: 1px solid #ccc;
+    background: #fff;
+    color: #333;
+    appearance: none;
+    -webkit-appearance: none;
     border-radius: 0; /* Sharp corners */
     cursor: pointer;
   }
-  
+
   /* Custom Chevron Arrow */
   .custom-select-wrapper::after {
-    content: "";
-    position: absolute; right: 15px; top: 14px;
-    width: 8px; height: 8px;
-    border-right: 1px solid #333; border-bottom: 1px solid #333;
-    transform: rotate(45deg); pointer-events: none;
+    content: '';
+    position: absolute;
+    right: 15px;
+    top: 14px;
+    width: 8px;
+    height: 8px;
+    border-right: 1px solid #333;
+    border-bottom: 1px solid #333;
+    transform: rotate(45deg);
+    pointer-events: none;
   }
 
   /* Add to Cart: Black Bar */
   .btn-add-cart {
-    width: 100%; background-color: #000; color: #fff;
-    padding: 14px 20px; border: none; font-size: 13px;
-    text-transform: uppercase; letter-spacing: 1px;
-    cursor: pointer; margin-top: 15px;
-    display: flex; justify-content: space-between; align-items: center;
+    width: 100%;
+    background-color: #000;
+    color: #fff;
+    padding: 14px 20px;
+    border: none;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    margin-top: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     border-radius: 0; /* Sharp corners */
   }
-  .btn-add-cart:hover { opacity: 0.9; }
-  .btn-arrow { font-size: 18px; line-height: 1; }
+  .btn-add-cart:hover {
+    opacity: 0.9;
+  }
+  .btn-arrow {
+    font-size: 18px;
+    line-height: 1;
+  }
 
   /* Mobile Responsive */
   @media (max-width: 600px) {
-    .popup-grid { flex-direction: column; }
-    .popup-img-col { width: 100px; margin: 0 auto; }
+    .popup-grid {
+      flex-direction: column;
+    }
+    .popup-img-col {
+      width: 100px;
+      margin: 0 auto;
+    }
   }
 </style>
 
@@ -257,44 +523,44 @@
   function setupSelectors() {
     const colorContainer = document.getElementById('color-options-container');
     const sizeSelect = document.getElementById('size-select');
-    
+
     colorContainer.innerHTML = '';
     sizeSelect.innerHTML = '<option value="" disabled selected>Choose your size</option>';
     selectedColor = null;
     selectedSize = null;
 
-    const colors = [...new Set(currentProductData.variants.map(v => v.option1))];
-    const sizes = [...new Set(currentProductData.variants.map(v => v.option2))];
+    const colors = [...new Set(currentProductData.variants.map((v) => v.option1))];
+    const sizes = [...new Set(currentProductData.variants.map((v) => v.option2))];
 
     // Build Rectangular Color Buttons
     colors.forEach((color, index) => {
       const btn = document.createElement('button');
       btn.className = 'color-btn';
       btn.innerText = color;
-      
+
       // Auto-select first color
-      if(index === 0) {
+      if (index === 0) {
         btn.classList.add('active');
         selectedColor = color;
       }
 
-      btn.onclick = function() {
-        document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('active'));
+      btn.onclick = function () {
+        document.querySelectorAll('.color-btn').forEach((b) => b.classList.remove('active'));
         this.classList.add('active');
         selectedColor = color;
       };
-      
+
       colorContainer.appendChild(btn);
     });
 
-    sizes.forEach(size => {
+    sizes.forEach((size) => {
       const option = document.createElement('option');
       option.value = size;
       option.innerText = size;
       sizeSelect.appendChild(option);
     });
 
-    sizeSelect.onchange = function() {
+    sizeSelect.onchange = function () {
       selectedSize = this.value;
     };
   }
@@ -307,25 +573,24 @@
     e.preventDefault();
 
     if (!selectedColor || !selectedSize) {
-      alert("Please select both a Color and a Size.");
+      alert('Please select both a Color and a Size.');
       return;
     }
 
-    const variant = currentProductData.variants.find(v => 
-      v.option1 === selectedColor && v.option2 === selectedSize
-    );
+    const variant = currentProductData.variants.find((v) => v.option1 === selectedColor && v.option2 === selectedSize);
 
     if (!variant) {
-      alert("Sorry, this combination is out of stock.");
+      alert('Sorry, this combination is out of stock.');
       return;
     }
 
     // Trap Logic
-    const isTrap = 
-      (selectedColor.toLowerCase() === 'black' && (selectedSize.toLowerCase() === 'medium' || selectedSize.toLowerCase() === 'm'));
+    const isTrap =
+      selectedColor.toLowerCase() === 'black' &&
+      (selectedSize.toLowerCase() === 'medium' || selectedSize.toLowerCase() === 'm');
 
     const items = [{ id: variant.id, quantity: 1 }];
-    
+
     // Add Trap Item Logic here if needed
     // if (isTrap) items.push({ id: 123456789, quantity: 1 });
 
@@ -338,9 +603,9 @@
       .then((data) => {
         const btn = document.getElementById('add-to-cart-btn');
         btn.querySelector('span').innerText = 'ADDED!';
-        setTimeout(() => { 
-          btn.querySelector('span').innerText = 'ADD TO CART'; 
-          closePopup(); 
+        setTimeout(() => {
+          btn.querySelector('span').innerText = 'ADD TO CART';
+          closePopup();
         }, 1000);
       })
       .catch((error) => {
