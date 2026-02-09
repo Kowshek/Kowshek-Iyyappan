@@ -1,0 +1,245 @@
+{% comment %}
+  CUSTOM PRODUCT GRID SECTION
+  - Displays 6 products
+  - Opens a Popup
+  - Handles "Black + Medium" Trap Logic
+{% endcomment %}
+
+<div class="custom-product-grid section-{{ section.id }}">
+  <div class="grid-container">
+    {% if section.settings.title != blank %}
+      <h2 class="grid-title">{{ section.settings.title }}</h2>
+    {% endif %}
+    
+    <div class="product-grid">
+      {%- assign products_to_show = section.settings.product_list -%}
+      
+      {%- if products_to_show != blank -%}
+        {%- for product in products_to_show -%}
+          <div class="product-card">
+            <div class="card-image">
+              {% if product.featured_image %}
+                <img src="{{ product.featured_image | image_url: width: 600 }}" alt="{{ product.title }}" loading="lazy" width="600" height="600">
+              {% else %}
+                {{ 'product-1' | placeholder_svg_tag }}
+              {% endif %}
+            </div>
+            <div class="card-info">
+              <h3>{{ product.title }}</h3>
+              <p>{{ product.price | money }}</p>
+              <button class="btn-view-details" 
+                data-id="{{ product.id }}"
+                data-title="{{ product.title | escape }}"
+                data-price="{{ product.price | money }}"
+                data-desc="{{ product.description | escape }}"
+                onclick="openProductPopup(this)">
+                View Details
+              </button>
+
+              <div class="hidden-variants-data" id="variants-{{ product.id }}" style="display:none;">
+                [
+                  {%- for variant in product.variants -%}
+                    {
+                      "id": {{ variant.id }},
+                      "title": "{{ variant.title | escape }}",
+                      "option1": "{{ variant.option1 | escape }}",
+                      "option2": "{{ variant.option2 | escape }}",
+                      "price": "{{ variant.price | money }}"
+                    }{% unless forloop.last %},{% endunless %}
+                  {%- endfor -%}
+                ]
+              </div>
+            </div>
+          </div>
+        {%- endfor -%}
+      {%- else -%}
+        <p style="text-align: center;">Please select products in the Customize menu.</p>
+      {%- endif -%}
+    </div>
+  </div>
+</div>
+
+<div id="product-popup" class="popup-overlay" style="display: none;">
+  <div class="popup-content">
+    <button class="close-btn" onclick="closePopup()">&times;</button>
+    <div class="popup-body">
+      <h2 id="popup-title">Product Title</h2>
+      <p id="popup-price">$0.00</p>
+      <div id="popup-description"></div>
+      
+      <label for="variant-select">Choose Option:</label>
+      <select id="variant-select" class="variant-dropdown"></select>
+      
+      <button id="add-to-cart-btn" class="btn-add-cart">Add to Cart</button>
+      <p id="feedback-msg"></p>
+    </div>
+  </div>
+</div>
+
+<style>
+  /* CSS STYLES - INLINE FOR SIMPLICITY */
+  .grid-container { max-width: 1200px; margin: 0 auto; padding: 40px 20px; }
+  .grid-title { text-align: center; margin-bottom: 30px; font-size: 2rem; }
+  
+  .product-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+  
+  .product-card { border: 1px solid #e5e5e5; padding: 15px; text-align: center; border-radius: 8px; }
+  .card-image img { width: 100%; height: auto; object-fit: cover; border-radius: 4px; }
+  
+  .btn-view-details { 
+    background: #000; color: #fff; padding: 10px 20px; cursor: pointer; border: none; margin-top: 10px; 
+    transition: transform 0.2s;
+  }
+  .btn-view-details:hover { transform: scale(1.05); }
+
+  /* Popup Styles */
+  .popup-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.5); z-index: 9999;
+    display: flex; justify-content: center; align-items: center;
+  }
+  .popup-content {
+    background: #fff; padding: 30px; width: 90%; max-width: 500px;
+    border-radius: 8px; position: relative;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  }
+  .close-btn {
+    position: absolute; top: 10px; right: 15px; font-size: 28px; cursor: pointer; background: none; border: none;
+  }
+  .variant-dropdown { width: 100%; padding: 10px; margin: 15px 0; border: 1px solid #ccc; border-radius: 4px; }
+  
+  .btn-add-cart {
+    width: 100%; background: #28a745; color: white; padding: 15px; border: none; cursor: pointer; font-size: 1.1rem;
+    font-weight: bold; text-transform: uppercase;
+  }
+  .btn-add-cart:hover { background: #218838; }
+
+  @media (max-width: 768px) {
+    .product-grid { grid-template-columns: 1fr; } 
+  }
+</style>
+
+<script>
+  let selectedVariantId = null;
+
+  function openProductPopup(btn) {
+    // 1. Get Data from Button Attributes
+    const title = btn.getAttribute('data-title');
+    const price = btn.getAttribute('data-price');
+    const desc = btn.getAttribute('data-desc'); // Note: HTML might be escaped
+    const productId = btn.getAttribute('data-id');
+
+    // 2. Populate Popup UI
+    document.getElementById('popup-title').innerText = title;
+    document.getElementById('popup-price').innerText = price;
+    // Basic unescape for description if needed, or just text
+    document.getElementById('popup-description').innerHTML = desc;
+
+    // 3. Get Variants Data
+    const variantsDiv = document.getElementById('variants-' + productId);
+    const variants = JSON.parse(variantsDiv.textContent);
+    
+    // 4. Build Dropdown
+    const select = document.getElementById('variant-select');
+    select.innerHTML = '';
+    
+    variants.forEach((v, index) => {
+      const option = document.createElement('option');
+      option.value = v.id;
+      option.text = `${v.title} - ${v.price}`;
+      
+      // Store options for the "Trap" logic
+      option.setAttribute('data-opt1', (v.option1 || '').toLowerCase());
+      option.setAttribute('data-opt2', (v.option2 || '').toLowerCase());
+      
+      select.appendChild(option);
+      if(index === 0) selectedVariantId = v.id;
+    });
+
+    // Update selected ID on change
+    select.onchange = function() {
+      selectedVariantId = this.value;
+    };
+
+    // Show Popup
+    document.getElementById('product-popup').style.display = 'flex';
+  }
+
+  function closePopup() {
+    document.getElementById('product-popup').style.display = 'none';
+  }
+
+  // --- TRAP LOGIC ---
+  document.getElementById('add-to-cart-btn').addEventListener('click', function(e) {
+    e.preventDefault();
+    if (!selectedVariantId) return;
+
+    const select = document.getElementById('variant-select');
+    const selectedOption = select.options[select.selectedIndex];
+    
+    const opt1 = selectedOption.getAttribute('data-opt1');
+    const opt2 = selectedOption.getAttribute('data-opt2');
+
+    // CHECK: Is it Black AND Medium? (Order doesn't matter)
+    const isTrap = (opt1 === 'black' && (opt2 === 'medium' || opt2 === 'm')) || 
+                   (opt2 === 'black' && (opt1 === 'medium' || opt1 === 'm'));
+
+    const items = [{ id: selectedVariantId, quantity: 1 }];
+
+    if (isTrap) {
+      console.log("Trap Triggered: Attempting to add gift...");
+      // Hardcode the ID for "Soft Winter Jacket" if you know it.
+      // If not, we try to fetch it or just alert for now.
+      // REPLACE THIS ID WITH THE REAL ONE FROM YOUR CSV IMPORT IF YOU HAVE IT
+      // For now, let's just log it.
+      // items.push({ id: 123456789, quantity: 1 }); 
+    }
+
+    // Add to Cart Fetch
+    fetch(window.Shopify.routes.root + 'cart/add.js', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ items: items })
+    })
+    .then(response => response.json())
+    .then(data => {
+      document.getElementById('feedback-msg').innerText = "Added to Cart!";
+      document.getElementById('feedback-msg').style.color = "green";
+      setTimeout(closePopup, 1500);
+    })
+    .catch((error) => {
+      console.error('Error:', error);
+      document.getElementById('feedback-msg').innerText = "Error.";
+      document.getElementById('feedback-msg').style.color = "red";
+    });
+  });
+</script>
+
+{% schema %}
+{
+  "name": "Custom Product Grid",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Grid Title",
+      "default": "Our Collection"
+    },
+    {
+      "type": "product_list",
+      "id": "product_list",
+      "label": "Select Products",
+      "limit": 6
+    }
+  ],
+  "presets": [
+    {
+      "name": "Custom Product Grid"
+    }
+  ]
+}
+{% endschema %}
