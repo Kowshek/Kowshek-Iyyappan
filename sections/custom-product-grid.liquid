@@ -1,7 +1,7 @@
 {% comment %}
-  CUSTOM PRODUCT GRID - FIGMA REPLICA & LINTER FIX
-  - Fixes "Missing width/height" error
-  - Matches Figma "Square/Sharp" aesthetic
+  CUSTOM PRODUCT GRID - STEP 1: LAYOUT RESTRUCTURE
+  - Top Section: Small Image (Left) + Text (Right)
+  - Bottom Section: Selectors flow underneath
 {% endcomment %}
 
 <div class="custom-product-grid section-{{ section.id }}">
@@ -42,9 +42,9 @@
               {
                 "id": {{ product.id }},
                 "title": "{{ product.title | escape }}",
-                "price": "{{ product.price | money }}",
-                "description": "{{ product.description | strip_html | truncatewords: 20 | escape }}",
-                "image": "{{ product.featured_image | image_url: width: 600 }}",
+                "price": "{{ product.price | money_without_trailing_zeros }}",
+                "description": "{{ product.description | strip_html | truncatewords: 25 | escape }}",
+                "image": "{{ product.featured_image | image_url: width: 400 }}",
                 "variants": [
                   {%- for variant in product.variants -%}
                     {
@@ -52,7 +52,7 @@
                       "title": "{{ variant.title | escape }}",
                       "option1": "{{ variant.option1 | escape }}",
                       "option2": "{{ variant.option2 | escape }}",
-                      "price": "{{ variant.price | money }}"
+                      "price": "{{ variant.price | money_without_trailing_zeros }}"
                     }{%- unless forloop.last %},{% endunless %}
                   {%- endfor -%}
                 ]
@@ -71,435 +71,401 @@
   <div class="popup-box">
     <button class="close-btn" onclick="closePopup()" aria-label="Close">&times;</button>
 
-    <div class="popup-grid">
-      <div class="popup-img-col">
-        <img id="popup-img" src="" alt="Product Preview" width="300" height="300">
+    <div class="popup-header-row">
+      <div class="popup-small-img">
+        <img id="popup-img" src="" alt="Product Preview" width="150" height="150">
       </div>
 
-      <div class="popup-info-col">
-        <div class="popup-header">
-          <h2 id="popup-title">Product Title</h2>
-          <p id="popup-price">$0.00</p>
-        </div>
-
+      <div class="popup-header-info">
+        <h2 id="popup-title">Product Title</h2>
+        <p id="popup-price">$0.00</p>
         <div id="popup-desc" class="popup-desc"></div>
+      </div>
+    </div>
 
-        <div class="selector-group">
-          <label class="selector-label">Color</label>
-          <div id="color-options-container" class="color-options"></div>
-        </div>
+    <div class="popup-form-row">
+      <div class="selector-group">
+        <label class="selector-label">Color</label>
+        <div id="color-options-container" class="color-options"></div>
+      </div>
 
-        <div class="selector-group">
-          <label class="selector-label">Size</label>
-          <div class="custom-select-wrapper">
-            <select id="size-select" class="custom-select">
-              <option value="" disabled selected>Choose your size</option>
-            </select>
-            <div class="select-arrow-box">
-              <svg width="12" height="8" viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M1 1.5L6 6.5L11 1.5" stroke="black" stroke-width="1.5"/>
-              </svg>
-            </div>
+      <div class="selector-group">
+        <label class="selector-label">Size</label>
+        <div class="custom-select-wrapper">
+          <select id="size-select" class="custom-select">
+            <option value="" disabled selected>Choose your size</option>
+          </select>
+          <div class="select-arrow-box">
+            <svg width="14" height="9" viewBox="0 0 14 9" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M1 1.5L7 7.5L13 1.5" stroke="black" stroke-width="1.5"/>
+            </svg>
           </div>
         </div>
-
-        <button id="add-to-cart-btn" class="btn-add-cart">
-          <span>ADD TO CART</span>
-          <span class="btn-arrow-long">
-            <svg width="24" height="8" viewBox="0 0 24 8" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M0 4H23M23 4L20 1M23 4L20 7" stroke="white" stroke-width="1.5"/>
-            </svg>
-          </span>
-        </button>
-        <p id="feedback-msg"></p>
       </div>
+
+      <button id="add-to-cart-btn" class="btn-add-cart">
+        <span>ADD TO CART</span>
+        <span class="btn-arrow-long">
+          <svg width="30" height="10" viewBox="0 0 30 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M0 5H29M29 5L25 1M29 5L25 9" stroke="white" stroke-width="1.5"/>
+          </svg>
+        </span>
+      </button>
+      <p id="feedback-msg"></p>
     </div>
   </div>
 </div>
 
 <style>
-  /* --- GRID STYLES --- */
-  .custom-product-grid {
-    padding: 60px 0;
-    background: #fff;
-  }
-  .grid-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 20px;
-  }
-  .grid-title {
-    font-size: 32px;
-    font-family: 'Times New Roman', serif;
-    margin-bottom: 30px;
-    color: #111;
-  }
-  .product-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
-  }
-  .product-card {
-    position: relative;
-  }
-  .card-image {
-    position: relative;
-    width: 100%;
-    padding-top: 100%;
-    background: #f4f4f4;
-  }
-  .card-image img {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
 
-  .hotspot-btn {
-    position: absolute;
-    top: 60%;
-    left: 65%;
-    width: 28px;
-    height: 28px;
-    background: #fff;
-    border-radius: 50%;
-    border: none;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-    transition: transform 0.2s;
-    z-index: 2;
-  }
-  .hotspot-btn:hover {
-    transform: scale(1.1);
-  }
-
-  .popup-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.6);
-    z-index: 9999;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.3s ease;
-  }
-  .popup-overlay[style*='display: flex'] {
-    opacity: 1;
-    pointer-events: auto;
-  }
-
-  .popup-box {
-    background: #fff;
-    width: 550px; /* Fixed width for consistency */
-    position: relative;
-    padding: 40px;
-    border-radius: 0; /* Sharp corners */
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-  }
-
-  .close-btn {
-    position: absolute;
-    top: 15px;
-    right: 20px;
-    font-size: 28px;
-    font-weight: 300;
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: #000;
-    z-index: 10;
-    line-height: 1;
-  }
-
-  .popup-grid {
-    display: flex;
-    gap: 20px;
-    align-items: flex-start;
-  }
-
-  .popup-img-col {
-    flex: 0 0 160px; /* Exact width constraint for image */
-  }
-
-  .popup-img-col img {
-    width: 100%;
-    height: auto;
-    display: block;
-    object-fit: cover;
-    aspect-ratio: 1 / 1.1; /* Slightly taller than square */
-  }
-
-  .popup-info-col {
-    flex: 1;
-    text-align: left;
-    display: flex;
-    flex-direction: column;
-  }
-
-  #popup-title {
-    font-size: 18px;
-    font-weight: 400;
-    margin: 0 0 8px;
-    color: #111;
-    font-family: sans-serif;
-    letter-spacing: 0.5px;
-  }
-
-  #popup-price {
-    font-size: 16px;
-    font-weight: 400;
-    margin-bottom: 15px;
-    color: #111;
-  }
-
-  .popup-desc {
-    font-size: 13px;
-    line-height: 1.5;
-    color: #444;
-    margin-bottom: 25px;
-    font-family: sans-serif;
-  }
-
-  /* --- SELECTORS (FIGMA EXACT) --- */
-  .selector-group {
-    margin-bottom: 20px;
-  }
-  .selector-label {
-    display: block;
-    font-size: 13px;
-    margin-bottom: 8px;
-    color: #333;
-  }
-
-  /* Color Buttons: Bordered Container */
-  .color-options {
-    display: flex;
-    border: 1px solid #ddd; /* Light grey border for container */
-    width: 100%;
-  }
-  .color-btn {
-    flex: 1;
-    background: #fff;
-    border: none;
-    padding: 12px 0;
-    font-size: 14px;
-    cursor: pointer;
-    text-align: center;
-    transition: all 0.2s;
-    color: #000;
-    border-right: 1px solid #ddd; /* Divider line */
-  }
-  .color-btn:last-child {
-    border-right: none;
-  }
-
-  /* Active State: Solid Black */
-  .color-btn.active {
-    background: #000;
-    color: #fff;
-    /* Fix: Active button covers the border */
-    margin: -1px;
-    border: 1px solid #000;
-    position: relative;
-    z-index: 2;
-  }
-
-  /* Size Dropdown: Split Box Style */
-  .custom-select-wrapper {
-    position: relative;
-    width: 100%;
-    border: 1px solid #ddd; /* Main border */
-    display: flex;
-    height: 45px;
-  }
-
-  .custom-select {
-    width: 100%;
-    height: 100%;
-    padding: 0 15px;
-    font-size: 14px;
-    border: none;
-    background: transparent;
-    color: #000;
-    appearance: none;
-    -webkit-appearance: none;
-    cursor: pointer;
-    z-index: 2; /* Sits above arrow */
-  }
-  .custom-select:focus {
-    outline: none;
-  }
-
-  /* The Arrow Box on the Right */
-  .select-arrow-box {
-    width: 45px; /* Square box */
-    height: 100%;
-    border-left: 1px solid #ddd;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    pointer-events: none; /* Let clicks pass through */
-    position: absolute;
-    right: 0;
-    top: 0;
-  }
-
-  /* Add to Cart: Solid Black */
-  .btn-add-cart {
-    width: 100%;
-    background-color: #000;
-    color: #fff;
-    padding: 16px 25px;
-    border: none;
-    font-size: 13px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    cursor: pointer;
-    margin-top: 10px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-radius: 0;
-  }
-  .btn-add-cart:hover {
-    opacity: 0.9;
-  }
-
-  /* Helper to align svg icon */
-  .btn-arrow-long {
-    display: flex;
-    align-items: center;
-  }
-
-  /* Mobile Responsive */
-  @media (max-width: 600px) {
-    .popup-box {
-      width: 95%;
-      padding: 20px;
+    /* The Sliding Black Background */
+    .slide-marker {
+      position: absolute;
+      top: 0; bottom: 0; left: 0;
+      height: 100%;
+      background-color: #000 !important;
+      border-left: 5px solid #000; /* CHANGED from blue (#0056b3) to black (#000) */
+      transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+      z-index: 0;
+      width: 0;
+      opacity: 0;
     }
-    .popup-grid {
-      flex-direction: column;
-    }
-    .popup-img-col {
-      width: 100px;
-      margin-bottom: 15px;
-    }
-  }
-  /* --- SELECTORS (FIGMA STYLE) --- */
-  .selector-group {
-    margin-bottom: 15px;
-  }
-  .selector-label {
-    display: block;
-    font-size: 12px;
-    margin-bottom: 5px;
-    color: #333;
+          /* --- GRID STYLES (Unchanged) --- */
+          .custom-product-grid {
+            padding: 60px 0;
+            background: #fff;
+            font-family: sans-serif;
+          }
+          .grid-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+          }
+          .grid-title {
+            font-size: 32px;
+            font-family: 'Times New Roman', serif;
+            margin-bottom: 30px;
+            color: #111;
+            font-weight: 400;
+          }
+          .product-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+          }
+          .product-card {
+            position: relative;
+          }
+          .card-image {
+            position: relative;
+            width: 100%;
+            padding-top: 100%;
+            background: #f4f4f4;
+          }
+          .card-image img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+          }
+          .hotspot-btn {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 32px;
+            height: 32px;
+            background: #fff;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+            transition: scale 0.2s;
+            z-index: 2;
+          }
+          .hotspot-btn span {
+            font-size: 20px;
+            line-height: 1;
+            color: #000;
+          }
+          .hotspot-btn:hover {
+            scale: 1.1;
+          }
+
+          /* --- NEW POPUP STYLES --- */
+          .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+          }
+          .popup-overlay[style*='display: flex'] {
+            opacity: 1;
+            pointer-events: auto;
+          }
+
+          .popup-box {
+            background: #fff;
+            width: 420px; /* Much narrower, like a card */
+            max-width: 90%;
+            padding: 30px;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+          }
+
+          .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 24px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #000;
+            z-index: 10;
+            line-height: 1;
+          }
+
+          /* TOP HEADER ROW */
+          .popup-header-row {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 25px; /* Spacing before form starts */
+          }
+
+          .popup-small-img {
+            flex: 0 0 130px; /* Fixed width for image */
+            height: 130px;
+          }
+
+          .popup-small-img img {
+            width: 110%;
+            height: 135%;
+            object-fit: cover;
+            display: block;
+          }
+
+          .popup-header-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+          }
+
+          #popup-title {
+            font-size: 18px;
+            font-weight: 400;
+            margin: 10px 0 0;
+            color: #111;
+            font-family: sans-serif;
+          }
+
+          #popup-price {
+            font-size: 16px;
+            font-weight: 400;
+            {% comment %} margin-bottom: 12px; {% endcomment %}
+            color: #111;
+          }
+
+          .popup-desc {
+            font-size: 13px;
+            line-height: 1.4;
+            color: #555;
+            font-family: sans-serif;
+          }
+
+          /* BOTTOM FORM ROW */
+          .popup-form-row {
+            display: block; /* Stack vertically */
+          }
+
+          .selector-group {
+            margin-bottom: 15px;
+          }
+          .selector-label {
+            display: block;
+            font-size: 14px;
+            margin-bottom: 8px;
+            color: #111;
+          }
+
+          {% comment %} /* Color Buttons (Previous Sliding Style) */
+          .color-options {
+            display: flex;
+            width: 100%;
+            border: 1px solid #e0e0e0;
+            height: 45px;
+          } {% endcomment %}
+          {% comment %} .color-btn {
+            flex: 1;
+            background: #fff;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+            text-align: center;
+            color: #000;
+            border-right: 1px solid #e0e0e0;
+            position: relative;
+          }
+          .color-btn:last-child {
+            border-right: none;
+          }
+          .color-btn.active {
+            background: #000;
+            color: #fff;
+            border-right: none;
+            margin: -1px;
+            border: 1px solid #000;
+            border-left: 5px solid #0056b3;
+            z-index: 2;
+          } {% endcomment %}
+
+          /* Size Dropdown */
+          .custom-select-wrapper {
+            position: relative;
+            width: 100%;
+            border: 1px solid #e0e0e0;
+            display: flex;
+            height: 50px;
+          }
+          .custom-select {
+            width: 100%;
+            height: 100%;
+            padding: 14px 10px;
+            height: 50px;
+            font-size: 16px;
+            border: none;
+            background: transparent;
+            color: #000;
+            appearance: none;
+            -webkit-appearance: none;
+            cursor: pointer;
+            z-index: 2;
+            text-align: center;
+            text-align-last: center;
+          }
+          .custom-select:focus {
+            outline: none;
+          }
+          .custom-select option {
+          padding: 18px 15px !important;
+          }
+          /* Hover state for dropdown options */
+         .custom-select option:hover {
+          background-color: #000 !important;
+          color: #fff;
+          }
+          .select-arrow-box {
+            width: 50px;
+            height: 100%;
+            border-left: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            pointer-events: none;
+            position: absolute;
+            right: 0;
+            top: 0;
+          }
+  /* 1. Base State: Smooth transition */
+  .select-arrow-box svg {
+    transition: transform 0.3s ease;
+    transform-origin: center;
   }
 
-  /* Color Buttons: Rectangular, Sharp */
-  .color-options {
-    display: flex;
-    gap: 0;
+  .custom-select-wrapper.active .select-arrow-box svg {
+    transform: rotate(180deg);
   }
-  .color-btn {
-    flex: 1;
-    background: #fff;
-    border: 1px solid #ccc;
-    padding: 10px 0;
-    font-size: 13px;
-    cursor: pointer;
-    text-align: center;
-    transition: all 0.2s;
-    border-radius: 0; /* Sharp corners */
-    color: #333;
-    margin-right: -1px; /* Merges borders */
-  }
+          /* Add to Cart */
+          .btn-add-cart {
+          width: 100%;
+          background-color: #000;
+          color: #fff;
+          padding: 18px 25px;
+          border: none;
+          font-size: 14px;
+          text-transform: uppercase;
+          letter-spacing: 1px;
+          cursor: pointer;
+          margin-top: 25px;
+          border-radius: 0;
+          display: flex;
+          justify-content: center; /* Centers the text */
+          align-items: center;
+          position: relative;
+          }
+          .btn-add-cart:hover {
+            opacity: 0.9;
+          }
+          .btn-arrow-long {
+      position: absolute;
+        right: 20px; /* Adjusts distance from the right edge */
+        display: flex;
+        align-items: center;
+          }
 
-  /* Active State: Black Background */
-  .color-btn.active {
-    background: #000;
-    color: #fff;
-    border-color: #000;
-    z-index: 1;
-  }
+          @media (max-width: 500px) {
+            .popup-header-row {
+              flex-direction: row;
+            } /* Keep side-by-side even on mobile if possible */
+            .popup-box {
+              width: 95%;
+              padding: 20px;
+            }
+          }
 
-  /* Size Dropdown */
-  .custom-select-wrapper {
-    position: relative;
-    width: 100%;
-  }
-  .custom-select {
-    width: 100%;
-    padding: 10px 12px;
-    font-size: 13px;
-    border: 1px solid #ccc;
-    background: #fff;
-    color: #333;
-    appearance: none;
-    -webkit-appearance: none;
-    border-radius: 0; /* Sharp corners */
-    cursor: pointer;
-  }
+         /* --- SLIDING COLOR SELECTOR CSS --- */
+          .color-options {
+            display: flex; width: 100%;
+            border: 1px solid #e0e0e0; /* Container Border */
+            height: 45px;
+            position: relative; /* Required for the marker to slide inside */
+            z-index: 1;
+          }
 
-  /* Custom Chevron Arrow */
-  .custom-select-wrapper::after {
-    content: '';
-    position: absolute;
-    right: 15px;
-    top: 14px;
-    width: 8px;
-    height: 8px;
-    border-right: 1px solid #333;
-    border-bottom: 1px solid #333;
-    transform: rotate(45deg);
-    pointer-events: none;
-  }
+          /* The Sliding Black Background */
+          .slide-marker {
+            position: absolute;
+            top: 0; bottom: 0; left: 0;
+            height: 100%;
+            background-color: #000 !important; /* Active Background is Black */
+            border-left: 5px solid #0056b3; /* Blue Accent Line */
+            transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1); /* Smooth Slide Animation */
+            z-index: 0; /* Behind the text */
+            width: 0; /* JS will set this */
+            opacity: 0; /* Hidden until JS sets position */
+          }
 
-  /* Add to Cart: Black Bar */
-  .btn-add-cart {
-    width: 100%;
-    background-color: #000;
-    color: #fff;
-    padding: 14px 20px;
-    border: none;
-    font-size: 13px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    cursor: pointer;
-    margin-top: 15px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-radius: 0; /* Sharp corners */
-  }
-  .btn-add-cart:hover {
-    opacity: 0.9;
-  }
-  .btn-arrow {
-    font-size: 18px;
-    line-height: 1;
-  }
+          /* The Buttons (Transparent) */
+          .color-btn {
+            flex: 1;
+            background: transparent;
+            border: none;
+            font-size: 16px; cursor: pointer; text-align: center;
+            color: #000; /* Default Text: Black */
+            border-right: 1px solid #e0e0e0; /* Divider */
+            position: relative;
+            z-index: 1; /* On top of marker */
+            transition: color 0.2s;
+          }
+          .color-btn:last-child { border-right: none; }
 
-  /* Mobile Responsive */
-  @media (max-width: 600px) {
-    .popup-grid {
-      flex-direction: column;
-    }
-    .popup-img-col {
-      width: 100px;
-      margin: 0 auto;
-    }
-  }
+          /* Active Text Color */
+          .color-btn.active { color: #fff; background-color: black}
 </style>
 
 <script>
@@ -507,8 +473,11 @@
   let selectedColor = null;
   let selectedSize = null;
 
+  // 1. OPEN POPUP
   function openProductPopup(productId) {
     const jsonScript = document.getElementById('data-' + productId);
+    if (!jsonScript) return;
+
     currentProductData = JSON.parse(jsonScript.textContent);
 
     document.getElementById('popup-img').src = currentProductData.image;
@@ -523,94 +492,148 @@
   function setupSelectors() {
     const colorContainer = document.getElementById('color-options-container');
     const sizeSelect = document.getElementById('size-select');
+    const wrapper = document.querySelector('.custom-select-wrapper');
 
+    // Reset UI
     colorContainer.innerHTML = '';
     sizeSelect.innerHTML = '<option value="" disabled selected>Choose your size</option>';
+
+    // Reset Data
     selectedColor = null;
     selectedSize = null;
 
-    const colors = [...new Set(currentProductData.variants.map((v) => v.option1))];
-    const sizes = [...new Set(currentProductData.variants.map((v) => v.option2))];
+    // Reset State
+    wrapper.classList.remove('active');
 
-    // Build Rectangular Color Buttons
-    colors.forEach((color, index) => {
-      const btn = document.createElement('button');
-      btn.className = 'color-btn';
-      btn.innerText = color;
+    const colors = [...new Set(currentProductData.variants.map((v) => v.option2))];
+    const sizes = [...new Set(currentProductData.variants.map((v) => v.option1))];
 
-      // Auto-select first color
-      if (index === 0) {
-        btn.classList.add('active');
-        selectedColor = color;
+    // --- COLOR BUTTONS ---
+    if (colors.length > 0 && colors[0] !== null) {
+      const marker = document.createElement('div');
+      marker.className = 'slide-marker';
+      colorContainer.appendChild(marker);
+
+      colors.forEach((color, index) => {
+        const btn = document.createElement('button');
+        btn.className = 'color-btn';
+        btn.innerText = color;
+
+        if (index === 0) {
+          selectedColor = color;
+          btn.classList.add('active');
+          setTimeout(() => {
+            moveMarker(btn, marker);
+            marker.style.opacity = '1';
+          }, 50);
+        }
+
+        btn.onclick = function () {
+          document.querySelectorAll('.color-btn').forEach((b) => b.classList.remove('active'));
+          this.classList.add('active');
+          moveMarker(this, marker);
+          selectedColor = color;
+        };
+        colorContainer.appendChild(btn);
+      });
+    }
+
+    // --- SIZE DROPDOWN ---
+    if (sizes.length > 0 && sizes[0] !== null) {
+      sizes.forEach((size) => {
+        if (size && size.trim() !== '') {
+          const option = document.createElement('option');
+          option.value = size;
+          option.innerText = size;
+          sizeSelect.appendChild(option);
+        }
+      });
+    }
+
+    // --- FIXED ARROW ROTATION LOGIC ---
+
+    // 1. Mouse Down: The Toggle Logic
+    sizeSelect.onmousedown = function (e) {
+      // If it's already the active element (focused), we are clicking to close it.
+      if (document.activeElement === this) {
+        this.blur(); // Force close
+        wrapper.classList.remove('active'); // Rotate Down
+        e.preventDefault(); // Stop browser from re-opening it immediately
+      } else {
+        // It's closed, so we are opening it.
+        wrapper.classList.add('active'); // Rotate Up
       }
+    };
 
-      btn.onclick = function () {
-        document.querySelectorAll('.color-btn').forEach((b) => b.classList.remove('active'));
-        this.classList.add('active');
-        selectedColor = color;
-      };
+    // 2. Blur: Rotate DOWN when clicking outside
+    sizeSelect.onblur = function () {
+      wrapper.classList.remove('active');
+    };
 
-      colorContainer.appendChild(btn);
-    });
-
-    sizes.forEach((size) => {
-      const option = document.createElement('option');
-      option.value = size;
-      option.innerText = size;
-      sizeSelect.appendChild(option);
-    });
-
+    // 3. Change: Rotate DOWN when item is selected
     sizeSelect.onchange = function () {
+      wrapper.classList.remove('active');
+      this.blur(); // Force blur to reset state
       selectedSize = this.value;
     };
   }
+  // 3. MARKER SLIDE HELPER
+  function moveMarker(targetBtn, marker) {
+    if (targetBtn && marker) {
+      marker.style.width = targetBtn.offsetWidth + 'px';
+      marker.style.transform = 'translateX(' + targetBtn.offsetLeft + 'px)';
+    }
+  }
 
+  // 4. CLOSE POPUP
   function closePopup() {
     document.getElementById('product-popup').style.display = 'none';
   }
 
+  // 5. ADD TO CART
   document.getElementById('add-to-cart-btn').addEventListener('click', function (e) {
     e.preventDefault();
+    const feedback = document.getElementById('feedback-msg');
+    feedback.innerText = '';
 
     if (!selectedColor || !selectedSize) {
-      alert('Please select both a Color and a Size.');
+      feedback.innerText = 'Please select both color and size.';
+      feedback.style.color = 'red';
       return;
     }
 
-    const variant = currentProductData.variants.find((v) => v.option1 === selectedColor && v.option2 === selectedSize);
+    const variant = currentProductData.variants.find((v) => v.option1 === selectedSize && v.option2 === selectedColor);
 
     if (!variant) {
-      alert('Sorry, this combination is out of stock.');
+      feedback.innerText = 'Unavailable combination.';
+      feedback.style.color = 'red';
       return;
     }
 
-    // Trap Logic
-    const isTrap =
-      selectedColor.toLowerCase() === 'black' &&
-      (selectedSize.toLowerCase() === 'medium' || selectedSize.toLowerCase() === 'm');
-
     const items = [{ id: variant.id, quantity: 1 }];
-
-    // Add Trap Item Logic here if needed
-    // if (isTrap) items.push({ id: 123456789, quantity: 1 });
 
     fetch(window.Shopify.routes.root + 'cart/add.js', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ items: items }),
     })
-      .then((response) => response.json())
+      .then((response) => {
+        if (response.ok) return response.json();
+        throw new Error('Bad response');
+      })
       .then((data) => {
         const btn = document.getElementById('add-to-cart-btn');
-        btn.querySelector('span').innerText = 'ADDED!';
+        const btnText = btn.querySelector('span:first-child');
+        const originalText = btnText.innerText;
+        btnText.innerText = 'ADDED!';
         setTimeout(() => {
-          btn.querySelector('span').innerText = 'ADD TO CART';
+          btnText.innerText = originalText;
           closePopup();
-        }, 1000);
+        }, 1500);
       })
       .catch((error) => {
-        console.error('Error:', error);
-        alert('Error adding to cart.');
+        console.error(error);
+        feedback.innerText = 'Error adding to cart.';
       });
   });
 </script>
@@ -619,23 +642,9 @@
 {
   "name": "Lookbook Grid",
   "settings": [
-    {
-      "type": "text",
-      "id": "title",
-      "label": "Grid Title",
-      "default": "Tisso vison in the wild"
-    },
-    {
-      "type": "product_list",
-      "id": "product_list",
-      "label": "Select Products",
-      "limit": 6
-    }
+    { "type": "text", "id": "title", "label": "Grid Title", "default": "Tisso vison in the wild" },
+    { "type": "product_list", "id": "product_list", "label": "Select Products", "limit": 6 }
   ],
-  "presets": [
-    {
-      "name": "Lookbook Grid"
-    }
-  ]
+  "presets": [{ "name": "Lookbook Grid" }]
 }
 {% endschema %}

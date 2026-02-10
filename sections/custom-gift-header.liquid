@@ -1,0 +1,164 @@
+
+
+<div class="gift-header-wrapper section-{{ section.id }}">
+  <div class="gift-header-container">
+    
+    <div class="gh-logo">
+      <a href="{{ routes.root_url }}">
+        {{ section.settings.logo_text }}
+      </a>
+    </div>
+
+    <div class="gh-center-text">
+      {{ section.settings.center_text }}
+    </div>
+
+    <a href="{{ section.settings.btn_link }}" class="gh-button">
+      <span>{{ section.settings.btn_text }}</span>
+      <svg width="24" height="14" viewBox="0 0 24 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M17 1L23 7L17 13M23 7H0" stroke="black" stroke-width="1.5"/>
+      </svg>
+    </a>
+
+  </div>
+</div>
+
+<style>
+  /* Wrapper for Background Color */
+  .gift-header-wrapper {
+    background-color: {{ section.settings.bg_color }};
+    width: 100%;
+    border-bottom: 1px solid #e5e5e5;
+  }
+
+  /* Container for Content alignment */
+  .gift-header-container {
+    max-width: 1400px; /* Adjust width to match your site */
+    margin: 0 auto;
+    padding: 15px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 80px; /* Fixed height based on image */
+  }
+
+  /* 1. Logo Style */
+  .gh-logo a {
+    font-family: 'Futura', sans-serif; /* Or your theme font */
+    font-weight: 700;
+    font-size: 24px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #000;
+    text-decoration: none;
+  }
+
+  /* 2. Center Text Style */
+  .gh-center-text {
+    font-family: sans-serif;
+    font-size: 16px;
+    color: #111;
+    font-weight: 400;
+  }
+
+  /* 3. Button Style */
+  .gh-button {
+    background-color: {{ section.settings.btn_color }};
+    color: #000;
+    padding: 12px 30px;
+    display: flex;
+    align-items: center;
+    gap: 15px; /* Space between text and arrow */
+    text-decoration: none;
+    font-family: sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: opacity 0.2s;
+  }
+
+  .gh-button:hover {
+    opacity: 0.8;
+  }
+
+  .gh-button svg {
+    display: block;
+    width: 20px; 
+    height: auto;
+  }
+
+  /* Mobile Responsive */
+  @media (max-width: 768px) {
+    .gift-header-container {
+      flex-direction: column;
+      height: auto;
+      padding: 20px;
+      gap: 15px;
+      text-align: center;
+    }
+    .gh-center-text {
+      font-size: 14px;
+    }
+    .gh-button {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Gift Header Bar",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "logo_text",
+      "label": "Logo Text",
+      "default": "TISSO VISON"
+    },
+    {
+      "type": "text",
+      "id": "center_text",
+      "label": "Center Message",
+      "default": "Find the ideal gift for your loved ones."
+    },
+    {
+      "type": "text",
+      "id": "btn_text",
+      "label": "Button Text",
+      "default": "CHOOSE GIFT"
+    },
+    {
+      "type": "url",
+      "id": "btn_link",
+      "label": "Button Link"
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#F5F5F5"
+    },
+    {
+      "type": "color",
+      "id": "btn_color",
+      "label": "Button Color",
+      "default": "#FFFA38"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Gift Header Bar"
+    }
+  ]
+}
+{% endschema %}
