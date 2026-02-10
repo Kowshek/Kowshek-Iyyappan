@@ -53,7 +53,7 @@
       "name": "custom-announcement-bar",
       "settings": {
         "custom_liquid": "",
-        "color_scheme": "",
+        "color_scheme": "scheme-2",
         "padding_top": 40,
         "padding_bottom": 52
       }
