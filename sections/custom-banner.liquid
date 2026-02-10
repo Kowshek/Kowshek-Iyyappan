@@ -1,36 +1,22 @@
-<div class="custom-banner-wrapper">
-  {% comment %}
-    <div class="gift-header-wrapper">
-      <div class="gift-header-container">
-        <div class="gh-logo">
-          <a href="{{ routes.root_url }}">{{ section.settings.top_logo_text }}</a>
-        </div>
-        <div class="gh-center-text">{{ section.settings.top_center_text }}</div>
-        <a href="{{ section.settings.top_btn_link }}" class="gh-button">
-          <span>{{ section.settings.top_btn_text }}</span>
-          <svg width="24" height="14" viewBox="0 0 24 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M17 1L23 7L17 13M23 7H0" stroke="black" stroke-width="1.5"/>
-          </svg>
-        </a>
-      </div>
-    </div>
-  {% endcomment %}
 
-  <div class="gift-guide-section">
-    <div class="gg-image-border top-border">
+
+<div class="custom-banner-wrapper">
+
+  <div class="gift-guide-stack">
+    <div class="gg-stack-item top-img-box">
       {%- if section.settings.top_image != blank -%}
         <img
-          src="{{ section.settings.top_image | image_url: width: 3000, height: 500}}"
+          src="{{ section.settings.top_image | image_url: width: 2000 }}"
           alt="Top Border"
           loading="lazy"
           width="2000"
-          height="400"
+          height="500"
         >
       {%- endif -%}
     </div>
 
-    <div class="gg-content-wrapper">
-      <div class="gg-content">
+    <div class="gg-stack-item content-box">
+      <div class="gg-content-inner">
         <h1 class="gg-heading">{{ section.settings.hero_heading }}</h1>
         <div class="gg-description">{{ section.settings.hero_text }}</div>
         <a href="{{ section.settings.hero_btn_link }}" class="gg-button">
@@ -42,14 +28,14 @@
       </div>
     </div>
 
-    <div class="gg-image-border bottom-border">
+    <div class="gg-stack-item bottom-img-box">
       {%- if section.settings.bottom_image != blank -%}
         <img
           src="{{ section.settings.bottom_image | image_url: width: 2000 }}"
           alt="Bottom Border"
           loading="lazy"
           width="2000"
-          height="400"
+          height="500"
         >
       {%- endif -%}
     </div>
@@ -59,98 +45,70 @@
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600;700&family=Lustria&display=swap');
 
-  .custom-banner-wrapper { width: 100%; position: relative; }
-
-  /* --- HEADER BAR --- */
-  .gift-header-wrapper {
-    background-color: {{ section.settings.top_bg_color }};
-    width: 100%; border-bottom: 1px solid #e5e5e5; position: relative; z-index: 10;
-  }
-  .gift-header-container {
-    max-width: 1400px; margin: 0 auto; padding: 0 40px;
-    display: flex; justify-content: space-between; align-items: center; height: 60px;
-  }
+  /* --- HEADER BAR (Keep existing) --- */
+  .custom-banner-wrapper { width: 100%; }
+  .gift-header-wrapper { background-color: {{ section.settings.top_bg_color }}; width: 100%; border-bottom: 1px solid #e5e5e5; }
+  .gift-header-container { max-width: 1400px; margin: 0 auto; padding: 0 40px; display: flex; justify-content: space-between; align-items: center; height: 60px; }
   .gh-logo a { font-family: 'Jost', sans-serif; font-weight: 700; font-size: 20px; letter-spacing: 2px; text-transform: uppercase; color: #000; text-decoration: none; }
   .gh-center-text { font-family: 'Jost', sans-serif; font-size: 15px; color: #111; font-weight: 400; letter-spacing: 0.5px; }
-  .gh-button {
-    background-color: {{ section.settings.top_btn_color }}; color: #000; padding: 10px 25px;
-    display: flex; align-items: center; gap: 12px; text-decoration: none;
-    font-family: 'Jost', sans-serif; font-size: 13px; font-weight: 500; text-transform: uppercase; letter-spacing: 1px; transition: opacity 0.2s;
-  }
+  .gh-button { background-color: {{ section.settings.top_btn_color }}; color: #000; padding: 10px 25px; display: flex; align-items: center; gap: 12px; text-decoration: none; font-family: 'Jost', sans-serif; font-size: 13px; font-weight: 500; text-transform: uppercase; letter-spacing: 1px; transition: opacity 0.2s; }
   .gh-button:hover { opacity: 0.8; }
   .gh-button svg { display: block; width: 18px; height: auto; }
 
-  /* --- HERO BANNER LAYOUT FIX --- */
-  .gift-guide-section {
-    position: relative;
+  /* --- LAYOUT FIX: GRID SYSTEM --- */
+  .gift-guide-stack {
+    display: grid;
+    /* This creates 2 columns: Text takes 40%, Bottom Image takes 60% */
+    grid-template-columns: 40% 60%;
+    /* This creates 2 rows: Top Image, then Content/Bottom Image */
+    grid-template-rows: auto auto; 
     width: 100%;
-    height: 157vh; /* Force a tall height */
-    min-height: 700px;
+    background: #fff;
     overflow: hidden;
-    background-color: #fff;
+  }
+
+  /* 1. TOP IMAGE (Full Width) */
+  .top-img-box {
+    grid-column: 1 / 3; /* Spans across both columns */
+    width: 100%;
+    line-height: 0;
+  }
+  .top-img-box img { width: 100%; height: auto; display: block; }
+
+  /* 2. TEXT CONTENT (Left Column) */
+  .content-box {
+    grid-column: 1 / 2; /* Sits in the first column */
     display: flex;
-    align-items: center; /* Center text vertically */
+    align-items: flex-start; /* Align text to top-ish to match design */
+    padding: 40px 0 40px 50px; /* Add Left Padding */
     justify-content: flex-start;
   }
+  
+  .gg-content-inner { max-width: 450px; width: 100%; }
 
-  /* SPLIT IMAGES - RESTRICT HEIGHT */
-  .gg-image-border {
-    position: absolute;
-    left: 0;
+  /* 3. BOTTOM IMAGE (Right Column) */
+  .bottom-img-box {
+    grid-column: 2 / 3; /* Sits in the second column */
     width: 100%;
-    height: 35%; /* CRITICAL: Only take up 35% height each, leaving 30% gap in middle */
-    z-index: 1;
-    pointer-events: none;
+    display: flex;
+    align-items: center; /* Center image vertically with text */
   }
+  .bottom-img-box img { width: 100%; height: auto; display: block; }
 
-  .gg-image-border img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: left center; /* Keeps camera/watch anchored left */
-  }
-
-  .top-border { top: 0; }
-  .bottom-border { bottom: 0; }
-
-  /* CONTENT - CENTERED IN WHITESPACE */
-  .gg-content-wrapper {
-    position: relative;
-    z-index: 2;
-    width: 100%;
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 0 50px;
-  }
-
-  .gg-content {
-    max-width: 550px;
-    margin-top: 10px; /* Fine-tune alignment */
-  }
-
-  .gg-heading {
-    font-family: 'Jost', sans-serif; font-weight: 600; font-size: 64px; line-height: 1.1; color: #000; margin: 0 0 25px 0; letter-spacing: -1px;
-  }
-  .gg-description {
-    font-family: 'Jost', sans-serif; font-size: 18px; line-height: 1.6; color: #111; margin-bottom: 40px; font-weight: 400;
-  }
-  .gg-button {
-    display: inline-flex; align-items: center; justify-content: space-between;
-    background-color: #000; color: #fff; text-decoration: none; padding: 18px 35px; min-width: 180px;
-    font-family: 'Jost', sans-serif; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; font-weight: 500; transition: opacity 0.2s ease;
-  }
+  /* TYPOGRAPHY */
+  .gg-heading { font-family: 'Jost', sans-serif; font-weight: 600; font-size: 64px; line-height: 1.1; color: #000; margin: 0 0 25px 0; letter-spacing: -1px; }
+  .gg-description { font-family: 'Jost', sans-serif; font-size: 18px; line-height: 1.6; color: #111; margin-bottom: 40px; font-weight: 400; }
+  .gg-button { display: inline-flex; align-items: center; justify-content: space-between; background-color: #000; color: #fff; text-decoration: none; padding: 18px 35px; min-width: 180px; font-family: 'Jost', sans-serif; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; font-weight: 500; transition: opacity 0.2s ease; }
   .gg-button:hover { opacity: 0.85; }
   .gg-button svg { margin-left: 15px; width: 20px; }
 
-  /* MOBILE RESPONSIVE */
+  /* MOBILE RESPONSIVE (Stack them back vertically) */
   @media (max-width: 768px) {
-    .gift-header-container { flex-direction: column; height: auto; padding: 15px 20px; gap: 15px; text-align: center; }
-
-    .gift-guide-section { height: auto; padding: 40px 0; justify-content: center; min-height: 500px; }
-    .gg-image-border { height: 150px; } /* Fixed height on mobile */
-
-    .gg-content-wrapper { padding: 0 25px; text-align: center; margin-top: 20px; margin-bottom: 20px; }
-    .gg-content { margin: 0 auto; }
+    .gift-header-container { flex-direction: column; height: auto; padding: 15px 20px; }
+    
+    .gift-guide-stack { display: flex; flex-direction: column; } /* Switch back to stack */
+    
+    .content-box { padding: 40px 25px; justify-content: center; text-align: center; }
     .gg-heading { font-size: 42px; }
     .gg-button { width: 100%; justify-content: center; }
   }
@@ -183,7 +141,7 @@
       "type": "textarea",
       "id": "hero_text",
       "label": "Description",
-      "default": "Discover Joy: Your Ultimate Holiday Gift Destination. Explore our curated selection and find the perfect gifts to delight your loved ones this holiday season."
+      "default": "Discover Joy: Your Ultimate Holiday Gift"
     },
     { "type": "text", "id": "hero_btn_label", "label": "Button Label", "default": "SHOP NOW" },
     { "type": "url", "id": "hero_btn_link", "label": "Button Link" }
