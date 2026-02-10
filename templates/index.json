@@ -48,6 +48,16 @@
         "show_text_below": false
       }
     },
+    "custom_liquid_qRczk3": {
+      "type": "custom-liquid",
+      "name": "custom-announcement-bar",
+      "settings": {
+        "custom_liquid": "",
+        "color_scheme": "",
+        "padding_top": 40,
+        "padding_bottom": 52
+      }
+    },
     "custom_product_grid_dWVmWh": {
       "type": "custom-product-grid",
       "name": "Custom Product Grid",
@@ -66,6 +76,7 @@
   },
   "order": [
     "image_banner",
+    "custom_liquid_qRczk3",
     "custom_product_grid_dWVmWh"
   ]
 }
