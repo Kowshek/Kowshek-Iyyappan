@@ -24,6 +24,9 @@
 </div>
 
 <style>
+  /* 1. IMPORT JOST FONT FROM GOOGLE */
+  @import url('https://fonts.googleapis.com/css2?family=Jost:wght@400;500;700&display=swap');
+
   /* Wrapper for Background Color */
   .gift-header-wrapper {
     background-color: {{ section.settings.bg_color }};
@@ -33,48 +36,50 @@
 
   /* Container for Content alignment */
   .gift-header-container {
-    max-width: 1400px; /* Adjust width to match your site */
+    max-width: 1400px;
     margin: 0 auto;
-    padding: 15px 40px;
+    padding: 0 40px; /* Removed top/bottom padding to let flex center it */
     display: flex;
     justify-content: space-between;
     align-items: center;
-    height: 80px; /* Fixed height based on image */
+    height: 60px; /* Reduced height to look sleeker like the image */
   }
 
-  /* 1. Logo Style */
+  /* 2. LOGO STYLE (Bold, Uppercase) */
   .gh-logo a {
-    font-family: 'Futura', sans-serif; /* Or your theme font */
-    font-weight: 700;
-    font-size: 24px;
+    font-family: 'Jost', sans-serif; /* CHANGED TO JOST */
+    font-weight: 500; /* Bold for the Logo */
+    font-size: 20px; /* Adjusted to match scale */
     letter-spacing: 2px;
     text-transform: uppercase;
     color: #000;
     text-decoration: none;
   }
 
-  /* 2. Center Text Style */
+  /* 3. CENTER TEXT STYLE (Regular, Normal Case) */
   .gh-center-text {
-    font-family: sans-serif;
-    font-size: 16px;
+    font-family: 'Jost', sans-serif; /* CHANGED TO JOST */
+    font-size: 15px;
     color: #111;
-    font-weight: 400;
+    font-weight: 400; /* Regular weight */
+    letter-spacing: 0.5px;
   }
 
-  /* 3. Button Style */
+  /* 4. BUTTON STYLE (Medium, Uppercase) */
   .gh-button {
     background-color: {{ section.settings.btn_color }};
     color: #000;
-    padding: 12px 30px;
+    padding: 10px 25px; /* Sleeker padding */
     display: flex;
     align-items: center;
-    gap: 15px; /* Space between text and arrow */
+    gap: 12px;
     text-decoration: none;
-    font-family: sans-serif;
-    font-size: 14px;
-    font-weight: 500;
+    
+    font-family: 'Jost', sans-serif; /* CHANGED TO JOST */
+    font-size: 13px;
+    font-weight: 500; /* Medium weight for button text */
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 1px;
     transition: opacity 0.2s;
   }
 
@@ -84,7 +89,7 @@
 
   .gh-button svg {
     display: block;
-    width: 20px; 
+    width: 18px; 
     height: auto;
   }
 
@@ -93,20 +98,15 @@
     .gift-header-container {
       flex-direction: column;
       height: auto;
-      padding: 20px;
+      padding: 15px 20px;
       gap: 15px;
       text-align: center;
     }
-    .gh-center-text {
-      font-size: 14px;
-    }
-    .gh-button {
-      width: 100%;
-      justify-content: center;
-    }
+    .gh-logo a { font-size: 22px; }
+    .gh-center-text { font-size: 14px; margin-bottom: 5px; }
+    .gh-button { width: 100%; justify-content: center; }
   }
 </style>
-
 {% schema %}
 {
   "name": "Gift Header Bar",
