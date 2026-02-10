@@ -1,28 +1,26 @@
-
-
 <div class="custom-banner-wrapper">
-  
-  {% comment %} <div class="gift-header-wrapper">
-    <div class="gift-header-container">
-      <div class="gh-logo">
-        <a href="{{ routes.root_url }}">{{ section.settings.top_logo_text }}</a>
+  {% comment %}
+    <div class="gift-header-wrapper">
+      <div class="gift-header-container">
+        <div class="gh-logo">
+          <a href="{{ routes.root_url }}">{{ section.settings.top_logo_text }}</a>
+        </div>
+        <div class="gh-center-text">{{ section.settings.top_center_text }}</div>
+        <a href="{{ section.settings.top_btn_link }}" class="gh-button">
+          <span>{{ section.settings.top_btn_text }}</span>
+          <svg width="24" height="14" viewBox="0 0 24 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M17 1L23 7L17 13M23 7H0" stroke="black" stroke-width="1.5"/>
+          </svg>
+        </a>
       </div>
-      <div class="gh-center-text">{{ section.settings.top_center_text }}</div>
-      <a href="{{ section.settings.top_btn_link }}" class="gh-button">
-        <span>{{ section.settings.top_btn_text }}</span>
-        <svg width="24" height="14" viewBox="0 0 24 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M17 1L23 7L17 13M23 7H0" stroke="black" stroke-width="1.5"/>
-        </svg>
-      </a>
     </div>
-  </div> {% endcomment %}
+  {% endcomment %}
 
   <div class="gift-guide-section">
-    
     <div class="gg-image-border top-border">
       {%- if section.settings.top_image != blank -%}
         <img
-          src="{{ section.settings.top_image | image_url: width: 2000 }}"
+          src="{{ section.settings.top_image | image_url: width: 3000, height: 500}}"
           alt="Top Border"
           loading="lazy"
           width="2000"
@@ -55,7 +53,6 @@
         >
       {%- endif -%}
     </div>
-
   </div>
 </div>
 
@@ -64,7 +61,7 @@
 
   .custom-banner-wrapper { width: 100%; position: relative; }
 
-  /* --- HEADER BAR STYLES --- */
+  /* --- HEADER BAR --- */
   .gift-header-wrapper {
     background-color: {{ section.settings.top_bg_color }};
     width: 100%; border-bottom: 1px solid #e5e5e5; position: relative; z-index: 10;
@@ -83,46 +80,53 @@
   .gh-button:hover { opacity: 0.8; }
   .gh-button svg { display: block; width: 18px; height: auto; }
 
-  /* --- HERO BANNER STYLES --- */
+  /* --- HERO BANNER LAYOUT FIX --- */
   .gift-guide-section {
     position: relative;
     width: 100%;
-    min-height: 700px; /* Taller height to fit both images + text */
+    height: 157vh; /* Force a tall height */
+    min-height: 700px;
     overflow: hidden;
     background-color: #fff;
     display: flex;
-    align-items: center; /* Centers content vertically */
+    align-items: center; /* Center text vertically */
     justify-content: flex-start;
   }
 
-  /* SPLIT IMAGES (Absolute Positioning) */
+  /* SPLIT IMAGES - RESTRICT HEIGHT */
   .gg-image-border {
     position: absolute;
     left: 0;
     width: 100%;
+    height: 35%; /* CRITICAL: Only take up 35% height each, leaving 30% gap in middle */
     z-index: 1;
-    pointer-events: none; /* Let clicks pass through to text if overlapping */
+    pointer-events: none;
   }
+
   .gg-image-border img {
     width: 100%;
-    height: auto;
-    display: block;
+    height: 100%;
+    object-fit: cover;
+    object-position: left center; /* Keeps camera/watch anchored left */
   }
 
   .top-border { top: 0; }
   .bottom-border { bottom: 0; }
 
-  /* CONTENT */
+  /* CONTENT - CENTERED IN WHITESPACE */
   .gg-content-wrapper {
-    position: relative; 
-    z-index: 2; 
-    width: 100%; 
-    max-width: 1400px; 
-    margin: 0 auto; 
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
     padding: 0 50px;
   }
-  
-  .gg-content { max-width: 550px; }
+
+  .gg-content {
+    max-width: 550px;
+    margin-top: 10px; /* Fine-tune alignment */
+  }
 
   .gg-heading {
     font-family: 'Jost', sans-serif; font-weight: 600; font-size: 64px; line-height: 1.1; color: #000; margin: 0 0 25px 0; letter-spacing: -1px;
@@ -141,12 +145,12 @@
   /* MOBILE RESPONSIVE */
   @media (max-width: 768px) {
     .gift-header-container { flex-direction: column; height: auto; padding: 15px 20px; gap: 15px; text-align: center; }
-    
-    .gift-guide-section { min-height: 500px; padding: 40px 0; justify-content: center; }
-    .gg-image-border img { height: 150px; object-fit: cover; } /* Crop images slightly on mobile to save space */
-    
-    .gg-content-wrapper { padding: 0 25px; text-align: center; }
-    .gg-content { margin: 0 auto; } /* Center text on mobile */
+
+    .gift-guide-section { height: auto; padding: 40px 0; justify-content: center; min-height: 500px; }
+    .gg-image-border { height: 150px; } /* Fixed height on mobile */
+
+    .gg-content-wrapper { padding: 0 25px; text-align: center; margin-top: 20px; margin-bottom: 20px; }
+    .gg-content { margin: 0 auto; }
     .gg-heading { font-size: 42px; }
     .gg-button { width: 100%; justify-content: center; }
   }
@@ -158,7 +162,12 @@
   "settings": [
     { "type": "header", "content": "Top Header Bar" },
     { "type": "text", "id": "top_logo_text", "label": "Logo Text", "default": "TISSO VISON" },
-    { "type": "text", "id": "top_center_text", "label": "Center Message", "default": "Find the ideal gift for your loved ones." },
+    {
+      "type": "text",
+      "id": "top_center_text",
+      "label": "Center Message",
+      "default": "Find the ideal gift for your loved ones."
+    },
     { "type": "text", "id": "top_btn_text", "label": "Header Button Text", "default": "CHOOSE GIFT" },
     { "type": "url", "id": "top_btn_link", "label": "Header Button Link" },
     { "type": "color", "id": "top_bg_color", "label": "Header Background", "default": "#F5F5F5" },
@@ -170,12 +179,15 @@
 
     { "type": "header", "content": "Banner Content" },
     { "type": "text", "id": "hero_heading", "label": "Heading", "default": "The Gift Guide" },
-    { "type": "textarea", "id": "hero_text", "label": "Description", "default": "Discover Joy: Your Ultimate Holiday Gift Destination." },
+    {
+      "type": "textarea",
+      "id": "hero_text",
+      "label": "Description",
+      "default": "Discover Joy: Your Ultimate Holiday Gift Destination. Explore our curated selection and find the perfect gifts to delight your loved ones this holiday season."
+    },
     { "type": "text", "id": "hero_btn_label", "label": "Button Label", "default": "SHOP NOW" },
     { "type": "url", "id": "hero_btn_link", "label": "Button Link" }
   ],
-  "presets": [
-    { "name": "Custom Banner (Split)" }
-  ]
+  "presets": [{ "name": "Custom Banner (Split)" }]
 }
 {% endschema %}
