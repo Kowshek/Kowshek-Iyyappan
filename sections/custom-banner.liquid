@@ -1,7 +1,4 @@
-
-
 <div class="custom-banner-wrapper">
-
   <div class="gift-guide-stack">
     <div class="gg-stack-item top-img-box">
       {%- if section.settings.top_image != blank -%}
@@ -45,23 +42,13 @@
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600;700&family=Lustria&display=swap');
 
-  /* --- HEADER BAR (Keep existing) --- */
-  .custom-banner-wrapper { width: 100%; }
-  .gift-header-wrapper { background-color: {{ section.settings.top_bg_color }}; width: 100%; border-bottom: 1px solid #e5e5e5; }
-  .gift-header-container { max-width: 1400px; margin: 0 auto; padding: 0 40px; display: flex; justify-content: space-between; align-items: center; height: 60px; }
-  .gh-logo a { font-family: 'Jost', sans-serif; font-weight: 700; font-size: 20px; letter-spacing: 2px; text-transform: uppercase; color: #000; text-decoration: none; }
-  .gh-center-text { font-family: 'Jost', sans-serif; font-size: 15px; color: #111; font-weight: 400; letter-spacing: 0.5px; }
-  .gh-button { background-color: {{ section.settings.top_btn_color }}; color: #000; padding: 10px 25px; display: flex; align-items: center; gap: 12px; text-decoration: none; font-family: 'Jost', sans-serif; font-size: 13px; font-weight: 500; text-transform: uppercase; letter-spacing: 1px; transition: opacity 0.2s; }
-  .gh-button:hover { opacity: 0.8; }
-  .gh-button svg { display: block; width: 18px; height: auto; }
-
   /* --- LAYOUT FIX: GRID SYSTEM --- */
   .gift-guide-stack {
     display: grid;
     /* This creates 2 columns: Text takes 40%, Bottom Image takes 60% */
     grid-template-columns: 40% 60%;
     /* This creates 2 rows: Top Image, then Content/Bottom Image */
-    grid-template-rows: auto auto; 
+    grid-template-rows: auto auto;
     width: 100%;
     background: #fff;
     overflow: hidden;
@@ -83,7 +70,7 @@
     padding: 40px 0 40px 50px; /* Add Left Padding */
     justify-content: flex-start;
   }
-  
+
   .gg-content-inner { max-width: 650px; width: 100%; }
 
   /* 3. BOTTOM IMAGE (Right Column) */
@@ -96,18 +83,21 @@
   .bottom-img-box img { width: 100%; height: auto; display: block; }
 
   /* TYPOGRAPHY */
-  .gg-heading { font-family: 'Jost', sans-serif; font-weight: 600; font-size: 80px; line-height: 1.1; color: #000; margin: 0 0 25px 0; letter-spacing: -1px; }
+  .gg-heading { font-family: 'Jost', sans-serif; font-weight: 600; font-size: 80px; line-height: 1.1; color: #000; margin: 0 0 50px 0; letter-spacing: -1px; }
   .gg-description { font-family: 'Jost', sans-serif; font-size: 23px; line-height: 1.6; color: #111; margin-bottom: 40px; font-weight: 400; }
-  .gg-button { display: inline-flex; align-items: center; justify-content: space-between; background-color: #000; color: #fff; text-decoration: none; padding: 15px 55px; min-width: 200px; font-family: 'Jost', sans-serif; font-size: 20px; text-transform: uppercase; letter-spacing: 1px; font-weight: 500; transition: opacity 0.2s ease; }
+  .gg-button { display: inline-flex; align-items: center; justify-content: space-between; background-color: #000; color: #fff; text-decoration: none; padding: 10px 20px 10px 55px; min-width: 200px; font-family: 'Jost', sans-serif; font-size: 20px; text-transform: uppercase; letter-spacing: 1px; font-weight: 400; transition: opacity 0.2s ease; }
   .gg-button:hover { opacity: 0.85; }
-  .gg-button svg { margin-left: 15px; width: 45px; }
+  .gg-button svg { 
+    margin-left: 15px; 
+    width: 55px;
+   }
 
   /* MOBILE RESPONSIVE (Stack them back vertically) */
   @media (max-width: 768px) {
     .gift-header-container { flex-direction: column; height: auto; padding: 15px 20px; }
-    
+
     .gift-guide-stack { display: flex; flex-direction: column; } /* Switch back to stack */
-    
+
     .content-box { padding: 40px 25px; justify-content: center; text-align: center; }
     .gg-heading { font-size: 42px; }
     .gg-button { width: 100%; justify-content: center; }
@@ -118,14 +108,6 @@
 {
   "name": "Custom Banner (Split)",
   "settings": [
-    { "type": "header", "content": "Top Header Bar" },
-    { "type": "text", "id": "top_logo_text", "label": "Logo Text", "default": "TISSO VISON" },
-    {
-      "type": "text",
-      "id": "top_center_text",
-      "label": "Center Message",
-      "default": "Find the ideal gift for your loved ones."
-    },
     { "type": "text", "id": "top_btn_text", "label": "Header Button Text", "default": "CHOOSE GIFT" },
     { "type": "url", "id": "top_btn_link", "label": "Header Button Link" },
     { "type": "color", "id": "top_bg_color", "label": "Header Background", "default": "#F5F5F5" },

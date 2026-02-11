@@ -1,8 +1,5 @@
-
-
 <div class="gift-header-wrapper section-{{ section.id }}">
   <div class="gift-header-container">
-    
     <div class="gh-logo">
       <a href="{{ routes.root_url }}">
         {{ section.settings.logo_text }}
@@ -19,7 +16,6 @@
         <path d="M17 1L23 7L17 13M23 7H0" stroke="black" stroke-width="1.5"/>
       </svg>
     </a>
-
   </div>
 </div>
 
@@ -36,21 +32,21 @@
 
   /* Container for Content alignment */
   .gift-header-container {
-    max-width: 100%;
+    max-width: 100% !important;
     margin: 0;
     padding: 0 40px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    height: 70px;
+    height: 70px !important;
   }
 
   /* 2. LOGO STYLE (Bold, Uppercase) */
   .gh-logo a {
     font-family: 'Jost', sans-serif;
-    font-weight: 500;
-    font-size: 30px;
-    /* letter-spacing: 2px; */
+    font-weight: 500 !important;
+    font-size: 30px !important;
+    letter-spacing: 0px !important;
     text-transform: uppercase;
     color: #000;
     text-decoration: none;
@@ -59,7 +55,7 @@
   /* 3. CENTER TEXT STYLE (Regular, Normal Case) */
   .gh-center-text {
     font-family: 'Jost', sans-serif; /* CHANGED TO JOST */
-    font-size: 23px;
+    font-size: 19px !important;
     color: #111;
     font-weight: 400; /* Regular weight */
     {% comment %} letter-spacing: 0.5px; {% endcomment %}
@@ -69,14 +65,14 @@
   .gh-button {
     background-color: #fffa38;
     color: #000;
-    padding: 10px 45px;
+    padding: 10px 20px 10px 35px !important;
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 35px !important;
     text-decoration: none;
     font-family: 'Jost', sans-serif;
-    font-size: 19px;
-    font-weight: 500;
+    font-size: 20px !important;
+    font-weight: 400;
     text-transform: uppercase;
     letter-spacing: 1px;
     transition: opacity 0.2s;
@@ -88,7 +84,7 @@
 
   .gh-button svg {
     display: block;
-    width: 18px; 
+    width: 30px;
     height: auto;
   }
 
