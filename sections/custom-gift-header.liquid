@@ -1,121 +1,287 @@
+{% comment %}
+  CUSTOM GIFT HEADER (Standalone)
+  - Desktop: Logo Left | Text Center | Button Right
+  - Mobile: Hamburger Left | Logo Center | Dropdown Menu (Text + Button)
+{% endcomment %}
+
 <div class="gift-header-wrapper section-{{ section.id }}">
   <div class="gift-header-container">
+    <button class="gh-hamburger medium-hide large-up-hide" onclick="toggleGiftMenu()">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M3 12H21" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M3 6H21" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M3 18H21" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+
     <div class="gh-logo">
       <a href="{{ routes.root_url }}">
         {{ section.settings.logo_text }}
       </a>
     </div>
+    <div class="gh-menu-content" id="GiftMenu">
+      <div class="gh-center-text">
+        <span class="desktop-msg">{{ section.settings.center_text }}</span>
 
-    <div class="gh-center-text">
-      {{ section.settings.center_text }}
+        <span class="mobile-msg">{{ section.settings.mobile_center_text }}</span>
+      </div>
+
+      <a href="{{ section.settings.btn_link }}" class="gh-button">
+        <span>{{ section.settings.btn_text }}</span>
+        <svg width="24" height="14" viewBox="0 0 24 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M17 1L23 7L17 13M23 7H0" stroke="black" stroke-width="1.5"/>
+        </svg>
+      </a>
     </div>
-
-    <a href="{{ section.settings.btn_link }}" class="gh-button">
-      <span>{{ section.settings.btn_text }}</span>
-      <svg width="24" height="14" viewBox="0 0 24 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M17 1L23 7L17 13M23 7H0" stroke="black" stroke-width="1.5"/>
-      </svg>
-    </a>
   </div>
 </div>
 
+<script>
+  function toggleGiftMenu() {
+    var menu = document.getElementById('GiftMenu');
+    menu.classList.toggle('open');
+  }
+</script>
+
 <style>
-  /* 1. IMPORT JOST FONT FROM GOOGLE */
+  /* 1. IMPORT JOST FONT */
   @import url('https://fonts.googleapis.com/css2?family=Jost:wght@400;500;700&display=swap');
 
-  /* Wrapper for Background Color */
+  /* Wrapper */
   .gift-header-wrapper {
     background-color: {{ section.settings.bg_color }};
     width: 100%;
     border-bottom: 1px solid #e5e5e5;
+    position: relative;
+    z-index: 50;
   }
 
-  /* Container for Content alignment */
+  /* Container */
   .gift-header-container {
-    max-width: 100% !important;
-    margin: 0;
+    max-width: 100%; /* Capped width for better desktop look */
+    margin: 0 auto;
     padding: 0 40px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    height: 70px !important;
+    height: 70px;
+    position: relative;
+    transition: all 0.4s ease-in-out !important; /* Smooth slide */
   }
 
-  /* 2. LOGO STYLE (Bold, Uppercase) */
+  /* UTILITY CLASSES */
+  @media (min-width: 769px) { .medium-hide { display: none; } }
+
+  /* LOGO */
   .gh-logo a {
     font-family: 'Jost', sans-serif;
     font-weight: 500 !important;
-    font-size: 30px !important;
+    font-size: 27px !important;
     letter-spacing: 0px !important;
     text-transform: uppercase;
     color: #000;
     text-decoration: none;
+    white-space: nowrap;
+    display: inline-block;
   }
 
-  /* 3. CENTER TEXT STYLE (Regular, Normal Case) */
-  .gh-center-text {
-    font-family: 'Jost', sans-serif; /* CHANGED TO JOST */
-    font-size: 19px !important;
-    color: #111;
-    font-weight: 400; /* Regular weight */
-    {% comment %} letter-spacing: 0.5px; {% endcomment %}
-  }
-
-  /* 4. BUTTON STYLE (Medium, Uppercase) */
-  .gh-button {
-    background-color: #fffa38;
-    color: #000;
-    padding: 10px 20px 10px 35px !important;
+  /* DESKTOP MENU LAYOUT */
+  .gh-menu-content {
     display: flex;
     align-items: center;
-    gap: 35px !important;
+    justify-content: space-between;
+    width: 100%;
+    margin-left: 40px; /* Space from logo */
+  }
+
+  .gh-center-text {
+    font-family: 'Jost', sans-serif;
+    font-size: 19px;
+    color: #111;
+    font-weight: 400;
+    margin: 0 auto; /* Center in the remaining space */
+  }
+
+  /* BUTTON STYLES */
+  .gh-button {
+    background-color: {{ section.settings.btn_color | default: '#FFFA38' }};
+    color: #000;
+    padding: 12px 30px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
     text-decoration: none;
     font-family: 'Jost', sans-serif;
-    font-size: 20px !important;
-    font-weight: 400;
+    font-weight: 500;
     text-transform: uppercase;
     letter-spacing: 1px;
-    transition: opacity 0.2s;
+    border: none;
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
   }
 
-  .gh-button:hover {
-    opacity: 0.8;
+  /* Hover Animation */
+  .gh-button span, .gh-button svg { position: relative; z-index: 2; transition: all 0.3s ease; }
+  .gh-button::before {
+    content: ""; position: absolute; top: 0; left: 0; width: 0%; height: 100%;
+    background-color: #000; z-index: 0; transition: width 0.3s ease-in-out;
+  }
+  .gh-button:hover::before { width: 100%; }
+  .gh-button:hover span { color: #fff; }
+  .gh-button:hover svg path { stroke: #fff; }
+  .gh-button svg { display: block; width: 30px; height: auto; }
+
+  /* HAMBURGER BUTTON (Hidden on Desktop) */
+  .gh-hamburger {
+    background: none; border: none; cursor: pointer; padding: 0;
   }
 
-  .gh-button svg {
-    display: block;
-    width: 30px;
-    height: auto;
-  }
-
-  /* Mobile Responsive */
+  /* --- MOBILE RESPONSIVE STYLES --- */
   @media (max-width: 768px) {
     .gift-header-container {
-      flex-direction: column;
-      height: auto;
-      padding: 15px 20px;
-      gap: 15px;
-      text-align: center;
+      justify-content: center;
+      padding: 15px 10px;
     }
-    .gh-logo a { font-size: 22px; }
-    .gh-center-text { font-size: 14px; margin-bottom: 5px; }
-    .gh-button { width: 100%; justify-content: center; }
+
+    /* Absolute Position Hamburger to Left */
+    .gh-hamburger {
+      position: absolute;
+      left: 20px;
+      top: 35%;
+      transform: translateY(-50%);
+      display: block;
+    }
+
+    .gh-logo a { font-size: 24px; }
+
+    /* MOBILE DROPDOWN MENU (Hidden by default) */
+    .gh-menu-content {
+/* 1. Layout: Always Flex (So it can animate) */
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      
+      /* 2. Positioning */
+      position: absolute;
+      top: 2px !important;
+      left: 0;
+      width: 100%;
+      background-color: {{ section.settings.bg_color }};
+      border-bottom: 1px solid #e5e5e5;
+      z-index: 49;
+      box-shadow: 0 5px 10px rgba(0,0,0,0.05);
+
+      /* 3. CLOSED STATE (Hidden) */
+      max-height: 0;
+      opacity: 0;
+      visibility: hidden; /* Prevents clicking when closed */
+      overflow: hidden;   /* Hides content */
+      padding: 0 10px;    /* Collapse padding */
+      margin: 0;
+
+      /* 4. THE SMOOTH TRANSITION */
+      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* SHOW MENU WHEN CLASS 'open' IS ADDED */
+    .gh-menu-content.open {
+      display: flex;
+      max-height: 500px;  /* Large enough to fit content */
+      opacity: 1;
+      visibility: visible;
+      padding: 20px 10px; /* Expand padding */
+    }
+
+    /* Mobile Text & Button Styling */
+    .gh-center-text {
+      margin-bottom: 20px;
+      text-align: center;
+      font-size: 16px;
+    }
+
+    .gh-button {
+        font-size: 14px;
+        width: 65%;
+        justify-content: center;
+    }
+  }
+  .mobile-msg { display: none; } /* Hide mobile text by default */
+  /* --- MOBILE RESPONSIVE STYLES (PUSH DOWN VARIATION) --- */
+ /* --- MOBILE RESPONSIVE STYLES (SMOOTH PUSH) --- */
+  @media (max-width: 768px) {
+    
+    /* 1. Header Container: Auto Height */
+    .gift-header-container {
+      flex-direction: column;
+      justify-content: flex-start;
+      height: auto !important; /* Grows with the menu */
+      min-height: 70px;
+      padding: 0 20px;
+      transition: height 0.5s ease; /* Smooth container growth */
+    }
+
+    /* Logo & Hamburger Positioning */
+    .gh-logo { margin-top: 18px; margin-bottom: 18px; }
+    .gh-logo a { font-size: 24px; }
+    
+    .gh-hamburger {
+      position: absolute;
+      left: 20px;
+      top: 40px;
+      transform: translateY(-50%);
+      display: block;
+    }
+
+    /* 2. Menu Content: The Animated Pusher */
+    .gh-menu-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      
+      /* Relative Position = Pushes content down */
+      position: relative;
+      
+      /* STARTING STATE (Closed) */
+      max-height: 0;
+      opacity: 0;
+      overflow: hidden;
+      
+      /* Zero out spacing so it doesn't take up room when closed */
+      margin-top: 0;
+      padding-bottom: 0;
+      
+      /* ANIMATE EVERYTHING (Height, Opacity, Margins, Padding) */
+      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* 3. OPEN STATE */
+    .gh-menu-content.open {
+      max-height: 500px; /* Target height */
+      opacity: 1;
+      
+      /* Add spacing smoothly */
+      {% comment %} margin-top: 1px; {% endcomment %}
+      padding-bottom: 30px;
+    }
+
+    /* Content Styling */
+    .gh-center-text { margin-bottom: 20px; text-align: center; font-size: 16px; }
+  }
+
+  @media (max-width: 768px) {
+    .desktop-msg { display: none; } /* Hide desktop text on phones */
+    .mobile-msg { display: inline; } /* Show mobile text on phones */
   }
 </style>
+
 {% schema %}
 {
   "name": "Gift Header Bar",
   "settings": [
-    {
-      "type": "header",
-      "content": "Content"
-    },
-    {
-      "type": "text",
-      "id": "logo_text",
-      "label": "Logo Text",
-      "default": "TISSO VISON"
-    },
+    { "type": "header", "content": "Content" },
+    { "type": "text", "id": "logo_text", "label": "Logo Text", "default": "TISSO VISON" },
     {
       "type": "text",
       "id": "center_text",
@@ -124,36 +290,16 @@
     },
     {
       "type": "text",
-      "id": "btn_text",
-      "label": "Button Text",
-      "default": "CHOOSE GIFT"
+      "id": "mobile_center_text",
+      "label": "Mobile Center Message",
+      "default": "Get started with \"Mi solo\" kit"
     },
-    {
-      "type": "url",
-      "id": "btn_link",
-      "label": "Button Link"
-    },
-    {
-      "type": "header",
-      "content": "Colors"
-    },
-    {
-      "type": "color",
-      "id": "bg_color",
-      "label": "Background Color",
-      "default": "#F5F5F5"
-    },
-    {
-      "type": "color",
-      "id": "btn_color",
-      "label": "Button Color",
-      "default": "#FFFA38"
-    }
+    { "type": "text", "id": "btn_text", "label": "Button Text", "default": "CHOOSE GIFT" },
+    { "type": "url", "id": "btn_link", "label": "Button Link" },
+    { "type": "header", "content": "Colors" },
+    { "type": "color", "id": "bg_color", "label": "Background Color", "default": "#F5F5F5" },
+    { "type": "color", "id": "btn_color", "label": "Button Color", "default": "#FFFA38" }
   ],
-  "presets": [
-    {
-      "name": "Gift Header Bar"
-    }
-  ]
+  "presets": [{ "name": "Gift Header Bar" }]
 }
 {% endschema %}

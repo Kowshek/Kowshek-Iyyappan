@@ -1,6 +1,14 @@
+{% comment %}
+  CUSTOM BANNER SECTION (Final Polish)
+  - Desktop: Grid Split.
+  - Mobile: Vertical Stack with Custom Text & Zoomed Image.
+{% endcomment %}
+
 <div class="custom-banner-wrapper">
+  
   <div class="gift-guide-stack">
-    <div class="gg-stack-item top-img-box">
+    
+    <div class="gg-stack-item top-img-box small-hide">
       {%- if section.settings.top_image != blank -%}
         <img
           src="{{ section.settings.top_image | image_url: width: 2000 }}"
@@ -14,120 +22,207 @@
 
     <div class="gg-stack-item content-box">
       <div class="gg-content-inner">
-        <h1 class="gg-heading">{{ section.settings.hero_heading }}</h1>
-        <div class="gg-description">{{ section.settings.hero_text }}</div>
-        <a href="{{ section.settings.hero_btn_link }}" class="gg-button">
+        
+        <h1 class="gg-heading">
+          <span class="desktop-text">{{ section.settings.hero_heading }}</span>
+          <span class="mobile-text">{{ section.settings.mobile_hero_heading }}</span>
+        </h1>
+
+        <div class="gg-description">
+          <span class="desktop-text">{{ section.settings.hero_text }}</span>
+          <span class="mobile-text">{{ section.settings.mobile_hero_text }}</span>
+        </div>
+        
+        <a href="{{ section.settings.hero_btn_link }}" class="gg-button small-hide">
           <span>{{ section.settings.hero_btn_label }}</span>
           <svg width="24" height="12" viewBox="0 0 24 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M18 1L23 6L18 11M23 6H0" stroke="white" stroke-width="1.5"/>
+            <path d="M18 1L23 6L18 11M23 6H0" stroke="currentColor" stroke-width="1.5"/>
           </svg>
         </a>
       </div>
     </div>
 
-    <div class="gg-stack-item bottom-img-box">
+    <div class="gg-stack-item mobile-img-box medium-hide large-up-hide">
+      {%- if section.settings.mobile_bg_image != blank -%}
+        <img
+          src="{{ section.settings.mobile_bg_image | image_url: width: 800, height: 1000 }}"
+          alt="Mobile Background"
+          loading="lazy"
+          width="800"
+          height="1000"
+        >
+        
+        <div class="mobile-btn-container">
+          <a href="{{ section.settings.hero_btn_link }}" class="gg-button mobile-overlay-btn">
+            <span>{{ section.settings.hero_btn_label }}</span>
+            <svg width="24" height="12" viewBox="0 0 24 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M18 1L23 6L18 11M23 6H0" stroke="currentColor" stroke-width="1.5"/>
+            </svg>
+          </a>
+        </div>
+      {%- endif -%}
+    </div>
+
+    <div class="gg-stack-item bottom-img-box small-hide">
       {%- if section.settings.bottom_image != blank -%}
         <img
           src="{{ section.settings.bottom_image | image_url: width: 2000 }}"
           alt="Bottom Border"
           loading="lazy"
           width="2000"
-          height="500"
+          height="900"
         >
       {%- endif -%}
     </div>
+
   </div>
 </div>
 
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600;700&family=Lustria&display=swap');
 
-  /* --- LAYOUT FIX: GRID SYSTEM --- */
+  .custom-banner-wrapper { width: 100%; }
+
+  /* --- DESKTOP GRID LAYOUT --- */
   .gift-guide-stack {
     display: grid;
-    /* This creates 2 columns: Text takes 40%, Bottom Image takes 60% */
     grid-template-columns: 40% 60%;
-    /* This creates 2 rows: Top Image, then Content/Bottom Image */
-    grid-template-rows: auto auto;
-    width: 100%;
-    background: #fff;
-    overflow: hidden;
+    grid-template-rows: auto auto; 
+    width: 100%; background: #fff; overflow: hidden;
+    position: relative;
   }
 
-  /* 1. TOP IMAGE (Full Width) */
-  .top-img-box {
-    grid-column: 1 / 3; /* Spans across both columns */
-    width: 100%;
-    line-height: 0;
-  }
+  /* TEXT VISIBILITY LOGIC */
+  .mobile-text { display: none; }
+  .desktop-text { display: block; }
+
+  /* Desktop Images */
+  .top-img-box { grid-column: 1 / 3; width: 100%; line-height: 0; }
   .top-img-box img { width: 100%; height: auto; display: block; }
 
-  /* 2. TEXT CONTENT (Left Column) */
-  .content-box {
-    grid-column: 1 / 2; /* Sits in the first column */
-    display: flex;
-    align-items: flex-start; /* Align text to top-ish to match design */
-    padding: 40px 0 40px 50px; /* Add Left Padding */
-    justify-content: flex-start;
-  }
-
-  .gg-content-inner { max-width: 650px; width: 100%; }
-
-  /* 3. BOTTOM IMAGE (Right Column) */
-  .bottom-img-box {
-    grid-column: 2 / 3; /* Sits in the second column */
-    width: 100%;
-    display: flex;
-    align-items: center; /* Center image vertically with text */
-  }
+  .bottom-img-box { grid-column: 2 / 3; width: 100%; display: flex; align-items: center; }
   .bottom-img-box img { width: 100%; height: auto; display: block; }
 
+  /* Content Positioning */
+  .content-box {
+    grid-column: 1 / 2; display: flex; align-items: flex-start; 
+    padding: 40px 0 40px 50px; justify-content: flex-start;
+    position: relative; z-index: 2;
+  }
+  .gg-content-inner { max-width: 450px; width: 100%; }
+
   /* TYPOGRAPHY */
-  .gg-heading { font-family: 'Jost', sans-serif; font-weight: 600; font-size: 80px; line-height: 1.1; color: #000; margin: 0 0 50px 0; letter-spacing: -1px; }
-  .gg-description { font-family: 'Jost', sans-serif; font-size: 23px; line-height: 1.6; color: #111; margin-bottom: 40px; font-weight: 400; }
-  .gg-button { display: inline-flex; align-items: center; justify-content: space-between; background-color: #000; color: #fff; text-decoration: none; padding: 10px 20px 10px 55px; min-width: 200px; font-family: 'Jost', sans-serif; font-size: 20px; text-transform: uppercase; letter-spacing: 1px; font-weight: 400; transition: opacity 0.2s ease; }
-  .gg-button:hover { opacity: 0.85; }
-  .gg-button svg { 
-    margin-left: 15px; 
-    width: 55px;
-   }
+  .gg-heading { font-family: 'Jost', sans-serif; font-weight: 600; font-size: 64px; line-height: 1.1; color: #000; margin: 0 0 25px 0; letter-spacing: -1px; }
+  .gg-description { font-family: 'Jost', sans-serif; font-size: 18px; line-height: 1.6; color: #111; margin-bottom: 40px; font-weight: 400; }
 
-  /* MOBILE RESPONSIVE (Stack them back vertically) */
+  /* BUTTON STYLES (Base) */
+  .gg-button {
+    background-color: #000; color: #fff; padding: 15px 35px;
+    display: inline-flex; align-items: center; justify-content: space-between;
+    text-decoration: none; font-family: 'Jost', sans-serif; font-size: 14px; font-weight: 500; text-transform: uppercase; letter-spacing: 1px; min-width: 180px;
+    position: relative; overflow: hidden; z-index: 2; transition: color 0.3s ease; border: none; gap: 12px;
+  }
+  .gg-button::before {
+    content: ""; position: absolute; top: 0; left: 0; width: 0%; height: 100%;
+    background-color: #FFFA38; z-index: -1; transition: width 0.3s ease-in-out; color: #000;
+  }
+  .gg-button:hover::before { width: 100%; }
+  .gg-button:hover span { color: #000; }
+  .gg-button:hover svg path { stroke: #000; }
+  .gg-button svg path { stroke: currentColor; transition: stroke 0.3s ease; }
+
+  /* --- MOBILE RESPONSIVE STYLES --- */
   @media (max-width: 768px) {
-    .gift-header-container { flex-direction: column; height: auto; padding: 15px 20px; }
+    /* Hide Desktop Elements */
+    .small-hide { display: none !important; }
+    .desktop-text { display: none !important; } /* Hide Desktop Text */
+    .mobile-text { display: block !important; } /* Show Mobile Text */
 
-    .gift-guide-stack { display: flex; flex-direction: column; } /* Switch back to stack */
+    /* 1. Stack Layout */
+    .gift-guide-stack {
+      display: flex;
+      flex-direction: column;
+      height: auto;
+    }
 
-    .content-box { padding: 40px 25px; justify-content: center; text-align: center; }
-    .gg-heading { font-size: 42px; }
-    .gg-button { width: 100%; justify-content: center; }
+    /* 2. Text Section (Top) */
+    .content-box {
+      order: 1;
+      width: 100%;
+      padding: 40px 25px 10px 25px; /* Less bottom padding */
+      text-align: center;
+      justify-content: center;
+      background: #fff;
+    }
+    .gg-content-inner { max-width: 100%; margin: 0 auto; }
+    
+    .gg-heading { font-size: 42px; color: #000; }
+    .gg-description { color: #111; margin-bottom: 10px; }
+
+    /* 3. Image Section (Bottom) with Overlay Button */
+    .mobile-img-box {
+      order: 2;
+      width: 100%;
+      line-height: 0;
+      position: relative; /* Critical for absolute button positioning */
+      z-index: 1;
+      overflow: hidden; /* Keeps zoomed image inside box */
+    }
+
+    /* ZOOM & MOVE IMAGE HERE */
+    .mobile-img-box img {
+        width: 178%;
+        height: 294px;
+        display: block;
+        transform: scale(1.0) translate(-166px, 3px);
+        transform-origin: center;
+    }
+
+    /* 4. Positioning the Button OVER the Image */
+    .mobile-btn-container {
+      position: absolute;
+      top: 70%; /* Positions button 25% down from top of image */
+      left: 0;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      z-index: 10;
+    }
+
+    /* Mobile Button Styles */
+    .mobile-overlay-btn {
+      width: 40%; /* Wider button on mobile */
+      max-width: 300px;
+      gap: 12px;
+      justify-content: center;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3); /* Strong shadow to pop against image */
+    }
   }
 </style>
 
 {% schema %}
 {
-  "name": "Custom Banner (Split)",
+  "name": "Custom Banner (Final)",
   "settings": [
-    { "type": "text", "id": "top_btn_text", "label": "Header Button Text", "default": "CHOOSE GIFT" },
-    { "type": "url", "id": "top_btn_link", "label": "Header Button Link" },
-    { "type": "color", "id": "top_bg_color", "label": "Header Background", "default": "#F5F5F5" },
-    { "type": "color", "id": "top_btn_color", "label": "Header Button Color", "default": "#FFFA38" },
+    { "type": "header", "content": "Desktop Content" },
+    { "type": "text", "id": "hero_heading", "label": "Heading (Desktop)", "default": "The Gift Guide" },
+    { "type": "textarea", "id": "hero_text", "label": "Description (Desktop)", "default": "Discover Joy: Your Ultimate Holiday Gift Destination. Explore our curated selection and find the perfect gifts to delight your loved ones this holiday season." },
 
-    { "type": "header", "content": "Banner Images" },
-    { "type": "image_picker", "id": "top_image", "label": "Top Border Image (Frame.png)" },
-    { "type": "image_picker", "id": "bottom_image", "label": "Bottom Border Image (Frame 1.png)" },
+    { "type": "header", "content": "Mobile Content" },
+    { "type": "text", "id": "mobile_hero_heading", "label": "Heading (Mobile)", "default": "The Gift Guide" },
+    { "type": "textarea", "id": "mobile_hero_text", "label": "Description (Mobile)", "default": "Discover Joy: Your Ultimate Holiday Gift Destination." },
 
-    { "type": "header", "content": "Banner Content" },
-    { "type": "text", "id": "hero_heading", "label": "Heading", "default": "The Gift Guide" },
-    {
-      "type": "textarea",
-      "id": "hero_text",
-      "label": "Description",
-      "default": "Discover Joy: Your Ultimate Holiday Gift"
-    },
+    { "type": "header", "content": "Button" },
     { "type": "text", "id": "hero_btn_label", "label": "Button Label", "default": "SHOP NOW" },
-    { "type": "url", "id": "hero_btn_link", "label": "Button Link" }
+    { "type": "url", "id": "hero_btn_link", "label": "Button Link" },
+
+    { "type": "header", "content": "Images" },
+    { "type": "image_picker", "id": "top_image", "label": "Desktop Top Image (Frame)" },
+    { "type": "image_picker", "id": "bottom_image", "label": "Desktop Bottom Image (Frame 1)" },
+    { "type": "image_picker", "id": "mobile_bg_image", "label": "Mobile Image (Single)" }
   ],
-  "presets": [{ "name": "Custom Banner (Split)" }]
+  "presets": [
+    { "name": "Custom Banner (Final)" }
+  ]
 }
 {% endschema %}
