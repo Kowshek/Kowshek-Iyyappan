@@ -26,6 +26,9 @@
     },
     "custom_banner_WdfR7q": {
       "type": "custom-banner",
+      "custom_css": [
+        "@media (max-width: 768px) {.mobile-img-box img {width: 178%; height: 294px; display: block; transform: scale(1) translate(-126px, 3px); transform-origin: center; }}"
+      ],
       "name": "Custom Banner (Mobile)",
       "settings": {
         "hero_heading": "The Gift Guide",
@@ -44,7 +47,8 @@
       "name": "Custom Announcement Bar",
       "settings": {
         "show_announcement": true,
-        "text": "SUSTAINABLE, ETHICALLY MADE CLOTHES IN SIZES XXS TO 6XL",
+        "desktop_text": "SUSTAINABLE, ETHICALLY MADE CLOTHES IN SIZES XXS TO 6XL",
+        "mobile_text": "SUSTAINABLE, ETHICALLY MADE ACTIVEWEAR",
         "link": "",
         "bg_color": "#f4f4f4",
         "text_color": "#000000"

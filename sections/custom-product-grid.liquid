@@ -531,7 +531,7 @@
       }
     }
     @media (max-width: 768px) {
-                  .card-image img {    
+                  .card-image img {
                 position: absolute;
                 top: 0;
                 left: 0;
@@ -543,173 +543,203 @@
 </style>
 
 <script>
-  let currentProductData = null;
-  let selectedColor = null;
-  let selectedSize = null;
+      let currentProductData = null;
+      let selectedColor = null;
+      let selectedSize = null;
 
-  // 1. OPEN POPUP
-  function openProductPopup(productId) {
-    const jsonScript = document.getElementById('data-' + productId);
-    if (!jsonScript) return;
 
-    currentProductData = JSON.parse(jsonScript.textContent);
+      // 1. OPEN POPUP
+      function openProductPopup(productId) {
+        const jsonScript = document.getElementById('data-' + productId);
+        if (!jsonScript) return;
 
-    document.getElementById('popup-img').src = currentProductData.image;
-    document.getElementById('popup-title').innerText = currentProductData.title;
-    document.getElementById('popup-price').innerText = currentProductData.price;
-    document.getElementById('popup-desc').innerHTML = currentProductData.description;
+        currentProductData = JSON.parse(jsonScript.textContent);
 
-    setupSelectors();
-    document.getElementById('product-popup').style.display = 'flex';
-  }
+        document.getElementById('popup-img').src = currentProductData.image;
+        document.getElementById('popup-title').innerText = currentProductData.title;
+        document.getElementById('popup-price').innerText = currentProductData.price;
+        document.getElementById('popup-desc').innerHTML = currentProductData.description;
 
-  function setupSelectors() {
-    const colorContainer = document.getElementById('color-options-container');
-    const sizeSelect = document.getElementById('size-select');
-    const wrapper = document.querySelector('.custom-select-wrapper');
-
-    // Reset UI
-    colorContainer.innerHTML = '';
-    sizeSelect.innerHTML = '<option value="" disabled selected>Choose your size</option>';
-
-    // Reset Data
-    selectedColor = null;
-    selectedSize = null;
-
-    // Reset State
-    wrapper.classList.remove('active');
-
-    const colors = [...new Set(currentProductData.variants.map((v) => v.option2))];
-    const sizes = [...new Set(currentProductData.variants.map((v) => v.option1))];
-
-    // --- COLOR BUTTONS ---
-    if (colors.length > 0 && colors[0] !== null) {
-      const marker = document.createElement('div');
-      marker.className = 'slide-marker';
-      colorContainer.appendChild(marker);
-
-      colors.forEach((color, index) => {
-        const btn = document.createElement('button');
-        btn.className = 'color-btn';
-        btn.innerText = color;
-
-        if (index === 0) {
-          selectedColor = color;
-          btn.classList.add('active');
-          setTimeout(() => {
-            moveMarker(btn, marker);
-            marker.style.opacity = '1';
-          }, 50);
-        }
-
-        btn.onclick = function () {
-          document.querySelectorAll('.color-btn').forEach((b) => b.classList.remove('active'));
-          this.classList.add('active');
-          moveMarker(this, marker);
-          selectedColor = color;
-        };
-        colorContainer.appendChild(btn);
-      });
-    }
-
-    // --- SIZE DROPDOWN ---
-    if (sizes.length > 0 && sizes[0] !== null) {
-      sizes.forEach((size) => {
-        if (size && size.trim() !== '') {
-          const option = document.createElement('option');
-          option.value = size;
-          option.innerText = size;
-          sizeSelect.appendChild(option);
-        }
-      });
-    }
-
-    // --- FIXED ARROW ROTATION LOGIC ---
-
-    // 1. Mouse Down: The Toggle Logic
-    sizeSelect.onmousedown = function (e) {
-      // If it's already the active element (focused), we are clicking to close it.
-      if (document.activeElement === this) {
-        this.blur(); // Force close
-        wrapper.classList.remove('active'); // Rotate Down
-        e.preventDefault(); // Stop browser from re-opening it immediately
-      } else {
-        // It's closed, so we are opening it.
-        wrapper.classList.add('active'); // Rotate Up
+        setupSelectors();
+        document.getElementById('product-popup').style.display = 'flex';
       }
-    };
 
-    // 2. Blur: Rotate DOWN when clicking outside
-    sizeSelect.onblur = function () {
-      wrapper.classList.remove('active');
-    };
+      function setupSelectors() {
+        const colorContainer = document.getElementById('color-options-container');
+        const sizeSelect = document.getElementById('size-select');
+        const wrapper = document.querySelector('.custom-select-wrapper');
 
-    // 3. Change: Rotate DOWN when item is selected
-    sizeSelect.onchange = function () {
-      wrapper.classList.remove('active');
-      this.blur(); // Force blur to reset state
-      selectedSize = this.value;
-    };
-  }
-  // 3. MARKER SLIDE HELPER
-  function moveMarker(targetBtn, marker) {
-    if (targetBtn && marker) {
-      marker.style.width = targetBtn.offsetWidth + 'px';
-      marker.style.transform = 'translateX(' + targetBtn.offsetLeft + 'px)';
-    }
-  }
+        // Reset UI
+        colorContainer.innerHTML = '';
+        sizeSelect.innerHTML = '<option value="" disabled selected>Choose your size</option>';
 
-  // 4. CLOSE POPUP
-  function closePopup() {
-    document.getElementById('product-popup').style.display = 'none';
-  }
+        // Reset Data
+        selectedColor = null;
+        selectedSize = null;
 
-  // 5. ADD TO CART
-  document.getElementById('add-to-cart-btn').addEventListener('click', function (e) {
-    e.preventDefault();
-    const feedback = document.getElementById('feedback-msg');
-    feedback.innerText = '';
+        // Reset State
+        wrapper.classList.remove('active');
 
-    if (!selectedColor || !selectedSize) {
-      feedback.innerText = 'Please select both color and size.';
-      feedback.style.color = 'red';
-      return;
-    }
+        const colors = [...new Set(currentProductData.variants.map((v) => v.option2))];
+        const sizes = [...new Set(currentProductData.variants.map((v) => v.option1))];
 
-    const variant = currentProductData.variants.find((v) => v.option1 === selectedSize && v.option2 === selectedColor);
+        // --- COLOR BUTTONS ---
+        if (colors.length > 0 && colors[0] !== null) {
+          const marker = document.createElement('div');
+          marker.className = 'slide-marker';
+          colorContainer.appendChild(marker);
 
-    if (!variant) {
-      feedback.innerText = 'Unavailable combination.';
-      feedback.style.color = 'red';
-      return;
-    }
+          colors.forEach((color, index) => {
+            const btn = document.createElement('button');
+            btn.className = 'color-btn';
+            btn.innerText = color;
 
-    const items = [{ id: variant.id, quantity: 1 }];
+            if (index === 0) {
+              selectedColor = color;
+              btn.classList.add('active');
+              setTimeout(() => {
+                moveMarker(btn, marker);
+                marker.style.opacity = '1';
+              }, 50);
+            }
 
-    fetch(window.Shopify.routes.root + 'cart/add.js', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ items: items }),
-    })
-      .then((response) => {
-        if (response.ok) return response.json();
-        throw new Error('Bad response');
+            btn.onclick = function () {
+              document.querySelectorAll('.color-btn').forEach((b) => b.classList.remove('active'));
+              this.classList.add('active');
+              moveMarker(this, marker);
+              selectedColor = color;
+            };
+            colorContainer.appendChild(btn);
+          });
+        }
+
+        // --- SIZE DROPDOWN ---
+        if (sizes.length > 0 && sizes[0] !== null) {
+          sizes.forEach((size) => {
+            if (size && size.trim() !== '') {
+              const option = document.createElement('option');
+              option.value = size;
+              option.innerText = size;
+              sizeSelect.appendChild(option);
+            }
+          });
+        }
+
+        // --- FIXED ARROW ROTATION LOGIC ---
+
+        // 1. Mouse Down: The Toggle Logic
+        sizeSelect.onmousedown = function (e) {
+          // If it's already the active element (focused), we are clicking to close it.
+          if (document.activeElement === this) {
+            this.blur(); // Force close
+            wrapper.classList.remove('active'); // Rotate Down
+            e.preventDefault(); // Stop browser from re-opening it immediately
+          } else {
+            // It's closed, so we are opening it.
+            wrapper.classList.add('active'); // Rotate Up
+          }
+        };
+
+        // 2. Blur: Rotate DOWN when clicking outside
+        sizeSelect.onblur = function () {
+          wrapper.classList.remove('active');
+        };
+
+        // 3. Change: Rotate DOWN when item is selected
+        sizeSelect.onchange = function () {
+          wrapper.classList.remove('active');
+          this.blur(); // Force blur to reset state
+          selectedSize = this.value;
+        };
+      }
+      // 3. MARKER SLIDE HELPER
+      function moveMarker(targetBtn, marker) {
+        if (targetBtn && marker) {
+          marker.style.width = targetBtn.offsetWidth + 'px';
+          marker.style.transform = 'translateX(' + targetBtn.offsetLeft + 'px)';
+        }
+      }
+
+      // 4. CLOSE POPUP
+      function closePopup() {
+        document.getElementById('product-popup').style.display = 'none';
+      }
+
+  // --------------------------------------------------
+    // 5. ADD TO CART LOGIC (With "Soft Winter Jacket" Rule)
+    // --------------------------------------------------
+    document.getElementById('add-to-cart-btn').addEventListener('click', function (e) {
+      e.preventDefault();
+      const feedback = document.getElementById('feedback-msg');
+      feedback.innerText = '';
+
+      // 1. Validation
+      if (!selectedColor || !selectedSize) {
+        feedback.innerText = 'Please select both color and size.';
+        feedback.style.color = 'red';
+        return;
+      }
+
+      // 2. Find Matching Variant
+      const variant = currentProductData.variants.find((v) => v.option1 === selectedSize && v.option2 === selectedColor);
+
+      if (!variant) {
+        feedback.innerText = 'Unavailable combination.';
+        feedback.style.color = 'red';
+        return;
+      }
+
+      // 3. Prepare Cart Items
+      const items = [{ id: variant.id, quantity: 1 }];
+
+      // 4. CHECK THE "DEVIL IN THE DETAILS" RULE
+      // "When any product with variant options Black and Medium is added..."
+      // We check if selectedSize is "Medium" and selectedColor is "Black" (Case sensitive usually, but let's be safe)
+      if (selectedSize === 'Medium' && selectedColor === 'Black') {
+        if (window.giftVariantId && window.giftVariantId !== null) {
+          items.push({
+            id: window.giftVariantId,
+            quantity: 1
+          });
+          console.log("Black + Medium detected! Adding Soft Winter Jacket.");
+        } else {
+          console.warn("Condition met, but 'Soft Winter Jacket' is not selected in Theme Customizer.");
+        }
+      }
+
+      // 5. AJAX Add to Cart
+      fetch(window.Shopify.routes.root + 'cart/add.js', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ items: items }),
       })
-      .then((data) => {
-        const btn = document.getElementById('add-to-cart-btn');
-        const btnText = btn.querySelector('span:first-child');
-        const originalText = btnText.innerText;
-        btnText.innerText = 'ADDED!';
-        setTimeout(() => {
-          btnText.innerText = originalText;
-          closePopup();
-        }, 1500);
-      })
-      .catch((error) => {
-        console.error(error);
-        feedback.innerText = 'Error adding to cart.';
-      });
-  });
+        .then((response) => {
+          if (response.ok) return response.json();
+          throw new Error('Bad response');
+        })
+        .then((data) => {
+          // Success Feedback
+          const btn = document.getElementById('add-to-cart-btn');
+          const btnText = btn.querySelector('span:first-child');
+          const originalText = btnText.innerText;
+
+          // If we added the gift, maybe change text to indicate it?
+          // For now, keep it simple as per instructions.
+          btnText.innerText = 'ADDED!';
+
+          setTimeout(() => {
+            btnText.innerText = originalText;
+            closePopup();
+          }, 1500);
+        })
+        .catch((error) => {
+          console.error(error);
+          feedback.innerText = 'Error adding to cart.';
+        });
+    });
+
+    // We grab the first variant ID of the selected gift product
+      window.giftVariantId = {{ section.settings.gift_product.first_available_variant.id | default: 'null' }};
 </script>
 
 {% schema %}
@@ -717,7 +747,17 @@
   "name": "Lookbook Grid",
   "settings": [
     { "type": "text", "id": "title", "label": "Grid Title", "default": "Tisso vison in the wild" },
-    { "type": "product_list", "id": "product_list", "label": "Select Products", "limit": 6 }
+    { "type": "product_list", "id": "product_list", "label": "Select Products", "limit": 6 },
+    {
+      "type": "header",
+      "content": "Gift Logic"
+    },
+    {
+      "type": "product",
+      "id": "gift_product",
+      "label": "Soft Winter Jacket (Auto-add product)",
+      "info": "Select the Soft Winter Jacket here. It will be added automatically if a user selects Black + Medium."
+    }
   ],
   "presets": [{ "name": "Lookbook Grid" }]
 }

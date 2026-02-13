@@ -1,17 +1,19 @@
 {% comment %}
+  ----------------------------------------------------------------------------------
   CUSTOM GIFT HEADER (Standalone)
-  - Desktop: Logo Left | Text Center | Button Right
-  - Mobile: Hamburger Left | Logo Center | Dropdown Menu (Text + Button)
+
+  - DESKTOP: Logo (Left) | Text (Center) | Button (Right)
+  - MOBILE: Hamburger (Left) | Logo (Center)
+  - MOBILE MENU: Clicking the hamburger pushes the content down to reveal Text + Button.
+  ----------------------------------------------------------------------------------
 {% endcomment %}
 
 <div class="gift-header-wrapper section-{{ section.id }}">
   <div class="gift-header-container">
-    <button class="gh-hamburger medium-hide large-up-hide" onclick="toggleGiftMenu()">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M3 12H21" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        <path d="M3 6H21" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        <path d="M3 18H21" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
+    <button class="gh-hamburger medium-hide large-up-hide" onclick="toggleGiftMenu()" aria-label="Menu">
+      <span class="bar top-bar"></span>
+      <span class="bar middle-bar"></span>
+      <span class="bar bottom-bar"></span>
     </button>
 
     <div class="gh-logo">
@@ -19,10 +21,10 @@
         {{ section.settings.logo_text }}
       </a>
     </div>
+
     <div class="gh-menu-content" id="GiftMenu">
       <div class="gh-center-text">
         <span class="desktop-msg">{{ section.settings.center_text }}</span>
-
         <span class="mobile-msg">{{ section.settings.mobile_center_text }}</span>
       </div>
 
@@ -39,12 +41,18 @@
 <script>
   function toggleGiftMenu() {
     var menu = document.getElementById('GiftMenu');
+    var btn = document.querySelector('.gh-hamburger');
+
+    // Toggle the 'open' class on the menu (slide down)
     menu.classList.toggle('open');
+
+    // Toggle the 'active' class on the button (turn to X)
+    btn.classList.toggle('active');
   }
 </script>
 
 <style>
-  /* 1. IMPORT JOST FONT */
+  /* 1. IMPORT FONT (Jost) */
   @import url('https://fonts.googleapis.com/css2?family=Jost:wght@400;500;700&display=swap');
 
   /* Wrapper */
@@ -58,7 +66,7 @@
 
   /* Container */
   .gift-header-container {
-    max-width: 100%; /* Capped width for better desktop look */
+    max-width: 100%;
     margin: 0 auto;
     padding: 0 40px;
     display: flex;
@@ -66,13 +74,13 @@
     align-items: center;
     height: 70px;
     position: relative;
-    transition: all 0.4s ease-in-out !important; /* Smooth slide */
+    transition: all 0.4s ease-in-out; /* Smooth slide for resizing */
   }
 
   /* UTILITY CLASSES */
   @media (min-width: 769px) { .medium-hide { display: none; } }
 
-  /* LOGO */
+  /* LOGO STYLES */
   .gh-logo a {
     font-family: 'Jost', sans-serif;
     font-weight: 500 !important;
@@ -91,7 +99,6 @@
     align-items: center;
     justify-content: space-between;
     width: 100%;
-    margin-left: 40px; /* Space from logo */
   }
 
   .gh-center-text {
@@ -99,8 +106,13 @@
     font-size: 19px;
     color: #111;
     font-weight: 400;
-    margin: 0 auto; /* Center in the remaining space */
+    margin: 0 auto; /* Center in remaining space */
   }
+
+  /* Text Switching Logic */
+  .mobile-msg { display: none; }
+  .desktop-msg { display: inline; }
+
 
   /* BUTTON STYLES */
   .gh-button {
@@ -121,7 +133,7 @@
     z-index: 1;
   }
 
-  /* Hover Animation */
+  /* Button Hover Animation (Slide Black) */
   .gh-button span, .gh-button svg { position: relative; z-index: 2; transition: all 0.3s ease; }
   .gh-button::before {
     content: ""; position: absolute; top: 0; left: 0; width: 0%; height: 100%;
@@ -132,105 +144,58 @@
   .gh-button:hover svg path { stroke: #fff; }
   .gh-button svg { display: block; width: 30px; height: auto; }
 
-  /* HAMBURGER BUTTON (Hidden on Desktop) */
+
+  /* --------------------------------------------------
+     HAMBURGER BUTTON STYLES (Mobile Only)
+     -------------------------------------------------- */
   .gh-hamburger {
     background: none; border: none; cursor: pointer; padding: 0;
+    width: 30px; height: 24px;
+    display: flex; flex-direction: column; justify-content: space-between;
+    z-index: 55;
   }
 
-  /* --- MOBILE RESPONSIVE STYLES --- */
-  @media (max-width: 768px) {
-    .gift-header-container {
-      justify-content: center;
-      padding: 15px 10px;
-    }
-
-    /* Absolute Position Hamburger to Left */
-    .gh-hamburger {
-      position: absolute;
-      left: 20px;
-      top: 35%;
-      transform: translateY(-50%);
-      display: block;
-    }
-
-    .gh-logo a { font-size: 24px; }
-
-    /* MOBILE DROPDOWN MENU (Hidden by default) */
-    .gh-menu-content {
-/* 1. Layout: Always Flex (So it can animate) */
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      
-      /* 2. Positioning */
-      position: absolute;
-      top: 2px !important;
-      left: 0;
-      width: 100%;
-      background-color: {{ section.settings.bg_color }};
-      border-bottom: 1px solid #e5e5e5;
-      z-index: 49;
-      box-shadow: 0 5px 10px rgba(0,0,0,0.05);
-
-      /* 3. CLOSED STATE (Hidden) */
-      max-height: 0;
-      opacity: 0;
-      visibility: hidden; /* Prevents clicking when closed */
-      overflow: hidden;   /* Hides content */
-      padding: 0 10px;    /* Collapse padding */
-      margin: 0;
-
-      /* 4. THE SMOOTH TRANSITION */
-      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    /* SHOW MENU WHEN CLASS 'open' IS ADDED */
-    .gh-menu-content.open {
-      display: flex;
-      max-height: 500px;  /* Large enough to fit content */
-      opacity: 1;
-      visibility: visible;
-      padding: 20px 10px; /* Expand padding */
-    }
-
-    /* Mobile Text & Button Styling */
-    .gh-center-text {
-      margin-bottom: 20px;
-      text-align: center;
-      font-size: 16px;
-    }
-
-    .gh-button {
-        font-size: 14px;
-        width: 65%;
-        justify-content: center;
-    }
+  .gh-hamburger .bar {
+    display: block; width: 100%; height: 2px;
+    background-color: #000; border-radius: 2px;
+    transition: all 0.3s ease-in-out; transform-origin: center;
   }
-  .mobile-msg { display: none; } /* Hide mobile text by default */
-  /* --- MOBILE RESPONSIVE STYLES (PUSH DOWN VARIATION) --- */
- /* --- MOBILE RESPONSIVE STYLES (SMOOTH PUSH) --- */
+
+  /* Active State (The X) */
+  .gh-hamburger.active .top-bar { transform: translateY(11px) rotate(45deg); }
+  .gh-hamburger.active .middle-bar { opacity: 0; transform: translateX(-10px); }
+  .gh-hamburger.active .bottom-bar { transform: translateY(-11px) rotate(-45deg); }
+
+
+  /* --------------------------------------------------
+     MOBILE RESPONSIVE STYLES
+     -------------------------------------------------- */
   @media (max-width: 768px) {
-    
-    /* 1. Header Container: Auto Height */
+
+    /* Text Switching */
+    .desktop-msg { display: none; }
+    .mobile-msg { display: inline; }
+
+    /* 1. Container: Grows smoothly */
     .gift-header-container {
       flex-direction: column;
       justify-content: flex-start;
-      height: auto !important; /* Grows with the menu */
+      height: auto !important; /* Allow growth */
       min-height: 70px;
       padding: 0 20px;
-      transition: height 0.5s ease; /* Smooth container growth */
+      transition: height 0.5s ease;
     }
 
     /* Logo & Hamburger Positioning */
     .gh-logo { margin-top: 18px; margin-bottom: 18px; }
     .gh-logo a { font-size: 24px; }
-    
+
     .gh-hamburger {
       position: absolute;
       left: 20px;
-      top: 40px;
-      transform: translateY(-50%);
-      display: block;
+      top: 35px; /* Half of min-height 70px */
+      transform: translateY(-30%);
+      display: flex; /* Ensure flex is active for bars */
     }
 
     /* 2. Menu Content: The Animated Pusher */
@@ -239,19 +204,19 @@
       flex-direction: column;
       align-items: center;
       width: 100%;
-      
+
       /* Relative Position = Pushes content down */
       position: relative;
-      
+
       /* STARTING STATE (Closed) */
       max-height: 0;
       opacity: 0;
       overflow: hidden;
-      
+
       /* Zero out spacing so it doesn't take up room when closed */
       margin-top: 0;
       padding-bottom: 0;
-      
+
       /* ANIMATE EVERYTHING (Height, Opacity, Margins, Padding) */
       transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
     }
@@ -260,19 +225,24 @@
     .gh-menu-content.open {
       max-height: 500px; /* Target height */
       opacity: 1;
-      
+
       /* Add spacing smoothly */
-      {% comment %} margin-top: 1px; {% endcomment %}
+      margin-top: 10px;
       padding-bottom: 30px;
     }
 
-    /* Content Styling */
-    .gh-center-text { margin-bottom: 20px; text-align: center; font-size: 16px; }
-  }
+    /* Mobile Content Styling */
+    .gh-center-text {
+      margin-bottom: 20px;
+      text-align: center;
+      font-size: 16px;
+    }
 
-  @media (max-width: 768px) {
-    .desktop-msg { display: none; } /* Hide desktop text on phones */
-    .mobile-msg { display: inline; } /* Show mobile text on phones */
+    .gh-button {
+      width: 65%; /* Match your preference */
+      justify-content: center;
+      font-size: 14px;
+    }
   }
 </style>
 
@@ -285,13 +255,13 @@
     {
       "type": "text",
       "id": "center_text",
-      "label": "Center Message",
+      "label": "Center Message (Desktop)",
       "default": "Find the ideal gift for your loved ones."
     },
     {
       "type": "text",
       "id": "mobile_center_text",
-      "label": "Mobile Center Message",
+      "label": "Center Message (Mobile)",
       "default": "Get started with \"Mi solo\" kit"
     },
     { "type": "text", "id": "btn_text", "label": "Button Text", "default": "CHOOSE GIFT" },
