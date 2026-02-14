@@ -1,0 +1,275 @@
+{% comment %}
+  ----------------------------------------------------------------------------------
+  CUSTOM GIFT HEADER (Standalone)
+
+  - DESKTOP: Logo (Left) | Text (Center) | Button (Right)
+  - MOBILE: Hamburger (Left) | Logo (Center)
+  - MOBILE MENU: Clicking the hamburger pushes the content down to reveal Text + Button.
+  ----------------------------------------------------------------------------------
+{% endcomment %}
+
+<div class="gift-header-wrapper section-{{ section.id }}">
+  <div class="gift-header-container">
+    <button class="gh-hamburger medium-hide large-up-hide" onclick="toggleGiftMenu()" aria-label="Menu">
+      <span class="bar top-bar"></span>
+      <span class="bar middle-bar"></span>
+      <span class="bar bottom-bar"></span>
+    </button>
+
+    <div class="gh-logo">
+      <a href="{{ routes.root_url }}">
+        {{ section.settings.logo_text }}
+      </a>
+    </div>
+
+    <div class="gh-menu-content" id="GiftMenu">
+      <div class="gh-center-text">
+        <span class="desktop-msg">{{ section.settings.center_text }}</span>
+        <span class="mobile-msg">{{ section.settings.mobile_center_text }}</span>
+      </div>
+
+      <a href="{{ section.settings.btn_link }}" class="gh-button">
+        <span>{{ section.settings.btn_text }}</span>
+        <svg width="24" height="14" viewBox="0 0 24 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M17 1L23 7L17 13M23 7H0" stroke="black" stroke-width="1.5"/>
+        </svg>
+      </a>
+    </div>
+  </div>
+</div>
+
+<script>
+  function toggleGiftMenu() {
+    var menu = document.getElementById('GiftMenu');
+    var btn = document.querySelector('.gh-hamburger');
+
+    // Toggle the 'open' class on the menu (slide down)
+    menu.classList.toggle('open');
+
+    // Toggle the 'active' class on the button (turn to X)
+    btn.classList.toggle('active');
+  }
+</script>
+
+<style>
+  /* 1. IMPORT FONT (Jost) */
+  @import url('https://fonts.googleapis.com/css2?family=Jost:wght@400;500;700&display=swap');
+
+  /* Wrapper */
+  .gift-header-wrapper {
+    background-color: {{ section.settings.bg_color }};
+    width: 100%;
+    border-bottom: 1px solid #e5e5e5;
+    position: relative;
+    z-index: 50;
+  }
+
+  /* Container */
+  .gift-header-container {
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 0 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 70px;
+    position: relative;
+    transition: all 0.4s ease-in-out; /* Smooth slide for resizing */
+  }
+
+  /* UTILITY CLASSES */
+  @media (min-width: 769px) { .medium-hide { display: none; } }
+
+  /* LOGO STYLES */
+  .gh-logo a {
+    font-family: 'Jost', sans-serif;
+    font-weight: 500 !important;
+    font-size: 27px !important;
+    letter-spacing: 0px !important;
+    text-transform: uppercase;
+    color: #000;
+    text-decoration: none;
+    white-space: nowrap;
+    display: inline-block;
+  }
+
+  /* DESKTOP MENU LAYOUT */
+  .gh-menu-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .gh-center-text {
+    font-family: 'Jost', sans-serif;
+    font-size: 19px;
+    color: #111;
+    font-weight: 400;
+    margin: 0 auto; /* Center in remaining space */
+  }
+
+  /* Text Switching Logic */
+  .mobile-msg { display: none; }
+  .desktop-msg { display: inline; }
+
+
+  /* BUTTON STYLES */
+  .gh-button {
+    background-color: {{ section.settings.btn_color | default: '#FFFA38' }};
+    color: #000;
+    padding: 12px 30px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    text-decoration: none;
+    font-family: 'Jost', sans-serif;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border: none;
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+  }
+
+  /* Button Hover Animation (Slide Black) */
+  .gh-button span, .gh-button svg { position: relative; z-index: 2; transition: all 0.3s ease; }
+  .gh-button::before {
+    content: ""; position: absolute; top: 0; left: 0; width: 0%; height: 100%;
+    background-color: #000; z-index: 0; transition: width 0.3s ease-in-out;
+  }
+  .gh-button:hover::before { width: 100%; }
+  .gh-button:hover span { color: #fff; }
+  .gh-button:hover svg path { stroke: #fff; }
+  .gh-button svg { display: block; width: 30px; height: auto; }
+
+
+  /* --------------------------------------------------
+     HAMBURGER BUTTON STYLES (Mobile Only)
+     -------------------------------------------------- */
+  .gh-hamburger {
+    background: none; border: none; cursor: pointer; padding: 0;
+    width: 30px; height: 24px;
+    display: flex; flex-direction: column; justify-content: space-between;
+    z-index: 55;
+  }
+
+  .gh-hamburger .bar {
+    display: block; width: 100%; height: 2px;
+    background-color: #000; border-radius: 2px;
+    transition: all 0.3s ease-in-out; transform-origin: center;
+  }
+
+  /* Active State (The X) */
+  .gh-hamburger.active .top-bar { transform: translateY(11px) rotate(45deg); }
+  .gh-hamburger.active .middle-bar { opacity: 0; transform: translateX(-10px); }
+  .gh-hamburger.active .bottom-bar { transform: translateY(-11px) rotate(-45deg); }
+
+
+  /* --------------------------------------------------
+     MOBILE RESPONSIVE STYLES
+     -------------------------------------------------- */
+  @media (max-width: 768px) {
+
+    /* Text Switching */
+    .desktop-msg { display: none; }
+    .mobile-msg { display: inline; }
+
+    /* 1. Container: Grows smoothly */
+    .gift-header-container {
+      flex-direction: column;
+      justify-content: flex-start;
+      height: auto !important; /* Allow growth */
+      min-height: 70px;
+      padding: 0 20px;
+      transition: height 0.5s ease;
+    }
+
+    /* Logo & Hamburger Positioning */
+    .gh-logo { margin-top: 18px; margin-bottom: 18px; }
+    .gh-logo a { font-size: 24px; }
+
+    .gh-hamburger {
+      position: absolute;
+      left: 20px;
+      top: 35px; /* Half of min-height 70px */
+      transform: translateY(-30%);
+      display: flex; /* Ensure flex is active for bars */
+    }
+
+    /* 2. Menu Content: The Animated Pusher */
+    .gh-menu-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+
+      /* Relative Position = Pushes content down */
+      position: relative;
+
+      /* STARTING STATE (Closed) */
+      max-height: 0;
+      opacity: 0;
+      overflow: hidden;
+
+      /* Zero out spacing so it doesn't take up room when closed */
+      margin-top: 0;
+      padding-bottom: 0;
+
+      /* ANIMATE EVERYTHING (Height, Opacity, Margins, Padding) */
+      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* 3. OPEN STATE */
+    .gh-menu-content.open {
+      max-height: 500px; /* Target height */
+      opacity: 1;
+
+      /* Add spacing smoothly */
+      margin-top: 10px;
+      padding-bottom: 30px;
+    }
+
+    /* Mobile Content Styling */
+    .gh-center-text {
+      margin-bottom: 20px;
+      text-align: center;
+      font-size: 16px;
+    }
+
+    .gh-button {
+      width: 65%; /* Match your preference */
+      justify-content: center;
+      font-size: 14px;
+    }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Gift Header Bar",
+  "settings": [
+    { "type": "header", "content": "Content" },
+    { "type": "text", "id": "logo_text", "label": "Logo Text", "default": "TISSO VISON" },
+    {
+      "type": "text",
+      "id": "center_text",
+      "label": "Center Message (Desktop)",
+      "default": "Find the ideal gift for your loved ones."
+    },
+    {
+      "type": "text",
+      "id": "mobile_center_text",
+      "label": "Center Message (Mobile)",
+      "default": "Get started with \"Mi solo\" kit"
+    },
+    { "type": "text", "id": "btn_text", "label": "Button Text", "default": "CHOOSE GIFT" },
+    { "type": "url", "id": "btn_link", "label": "Button Link" },
+    { "type": "header", "content": "Colors" },
+    { "type": "color", "id": "bg_color", "label": "Background Color", "default": "#F5F5F5" },
+    { "type": "color", "id": "btn_color", "label": "Button Color", "default": "#FFFA38" }
+  ],
+  "presets": [{ "name": "Gift Header Bar" }]
+}
+{% endschema %}

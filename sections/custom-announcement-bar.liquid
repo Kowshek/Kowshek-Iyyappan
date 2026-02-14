@@ -1,0 +1,121 @@
+{% comment %}
+  CUSTOM ANNOUNCEMENT BAR
+  - Matches the "Sustainable, Ethically Made..." reference image.
+  - Features: Light Grey Background, Centered Uppercase Text, Clean Layout.
+{% endcomment %}
+
+{%- if section.settings.show_announcement -%}
+  <div class="custom-announcement-bar">
+    <div class="page-width">
+      <p class="announcement-text">
+        {%- if section.settings.link != blank -%}
+          <a href="{{ section.settings.link }}" class="announcement-link">
+            <span class="announce-desktop">{{ section.settings.desktop_text | escape }}</span>
+            <span class="announce-mobile">{{ section.settings.mobile_text | escape }}</span>
+          </a>
+        {%- else -%}
+          <span class="announce-desktop">{{ section.settings.desktop_text | escape }}</span>
+          <span class="announce-mobile">{{ section.settings.mobile_text | escape }}</span>
+        {%- endif -%}
+      </p>
+    </div>
+  </div>
+{%- endif -%}
+
+<style>
+  /* 1. IMPORT FONT (Jost) */
+  @import url('https://fonts.googleapis.com/css2?family=Jost:wght@400;500&display=swap');
+
+  /* 2. BAR CONTAINER */
+  .custom-announcement-bar {
+    background-color: {{ section.settings.bg_color }};
+    width: 100%;
+    padding: 10px 0; /* Adjust height */
+    border-bottom: 1px solid rgba(0,0,0,0.05); /* Optional subtle border */
+    position: relative;
+    z-index: 5;
+  }
+
+  /* 3. TEXT STYLING */
+  .announcement-text {
+    margin: 0;
+    text-align: center;
+    font-family: 'Jost', sans-serif; /* Use the specific font */
+    font-size: 17px; /* Small, crisp size */
+    font-weight: 400; /* Medium weight */
+    text-transform: uppercase; /* Force ALL CAPS */
+    letter-spacing: 1px; /* Slight spacing for readability */
+    color: {{ section.settings.text_color }};
+  }
+
+  /* Link Styling */
+  .announcement-link {
+    text-decoration: none;
+    color: inherit;
+    transition: opacity 0.2s;
+  }
+  .announcement-link:hover {
+    opacity: 0.7;
+  }
+
+  .announce-desktop { display: inline; }
+  .announce-mobile { display: none; }
+
+  /* Mobile: Hide Desktop, Show Mobile */
+  @media (max-width: 768px) {
+    .announce-desktop { display: none; }
+    .announce-mobile {
+      display: inline;
+      font-size: 13px; /* Slightly smaller on mobile */
+    }
+     }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Custom Announcement Bar",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_announcement",
+      "label": "Show Announcement",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "desktop_text",
+      "label": "Announcement Text (Desktop)",
+      "default": "SUSTAINABLE, ETHICALLY MADE CLOTHES IN SIZES XXS TO 6XL"
+    },
+    {
+      "type": "text",
+      "id": "mobile_text",
+      "label": "Announcement Text (Mobile)",
+      "default": "SUSTAINABLE, ETHICALLY MADE ACTIVEWEAR"
+    },
+    {
+      "type": "url",
+      "id": "link",
+      "label": "Link (Optional)"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#F4F4F4"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#000000"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Custom Announcement Bar"
+    }
+  ]
+}
+{% endschema %}
