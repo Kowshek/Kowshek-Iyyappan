@@ -56,6 +56,9 @@
     },
     "custom_product_grid_dWVmWh": {
       "type": "custom-product-grid",
+      "custom_css": [
+        "@media (max-width: 500px) {.popup-desc {font-size: 12px; line-height: 1; color: #000000; font-family: \"Jost\"; } #popup-title {font-size: 14px; }}"
+      ],
       "name": "Custom Product Grid",
       "settings": {
         "title": "Tisso vison in the wild",
@@ -66,7 +69,8 @@
           "classic-leather-jacket",
           "classic-varsity-top",
           "dark-denim-top"
-        ]
+        ],
+        "gift_product": "dark-winter-jacket"
       }
     }
   },
